@@ -5,6 +5,11 @@
   "main": "src/index.ts",
   "repository": "git@github.com:daoism-systems/dSafe-SDK.git",
   "author": "Mihirsinh Parmar <mihirsinh.parmar.it@gmail.com>",
+  "scripts": {
+    "lint": "eslint src/**/*.{js,ts,json}",
+    "lint:fix": "eslint --fix 'src/**/*.{js,ts,json}'",
+    "format": "prettier --write 'src/**/*.{js,ts,css,md,json}' --config ./.prettierrc"
+  },
   "license": "MIT",
   "devDependencies": {
     "@changesets/cli": "^2.26.2",
@@ -12,11 +17,14 @@
     "@typescript-eslint/eslint-plugin": "^6.4.0",
     "@typescript-eslint/parser": "^6.9.0",
     "eslint": "^8.0.1",
+    "eslint-config-prettier": "^9.0.0",
     "eslint-config-standard-with-typescript": "^39.1.1",
     "eslint-import-resolver-typescript": "^3.6.1",
     "eslint-plugin-import": "^2.29.0",
     "eslint-plugin-n": "^15.0.0 || ^16.0.0 ",
+    "eslint-plugin-prettier": "^5.0.1",
     "eslint-plugin-promise": "^6.0.0",
+    "prettier": "^3.0.3",
     "typescript": "*"
   },
   "packageManager": "yarn@4.0.1"
