@@ -14,7 +14,8 @@
     "build": "tsup",
     "publish": "bash shell/publish.sh",
     "publish:npm": "yarn npm publish --access public",
-    "test": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' mocha -r ts-node/register 'test/**/*.ts'"
+    "test": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' mocha -r ts-node/register 'test/**/*.ts'",
+    "coverage": "nyc yarn test"
   },
   "engines": {
     "node": ">=18.18.2"
@@ -27,6 +28,7 @@
   "license": "MIT",
   "devDependencies": {
     "@changesets/cli": "^2.26.2",
+    "@istanbuljs/nyc-config-typescript": "^1.0.2",
     "@types/chai": "^4.3.9",
     "@types/eslint": "^8",
     "@types/mocha": "^10.0.3",
@@ -44,6 +46,7 @@
     "eslint-plugin-prettier": "^5.0.1",
     "eslint-plugin-promise": "^6.0.0",
     "mocha": "^10.2.0",
+    "nyc": "^15.1.0",
     "prettier": "^3.0.3",
     "sinon": "^17.0.0",
     "ts-node": "^10.9.1",

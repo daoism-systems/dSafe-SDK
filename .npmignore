@@ -10,3 +10,7 @@ tsup.config.ts
 yarn.lock
 test
 shell
+coverage
+.nyc_output
+.github
+.nycrc
