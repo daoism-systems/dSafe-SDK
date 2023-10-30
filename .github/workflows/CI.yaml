@@ -1,4 +1,4 @@
-name: @dSafe/sdk
+name: dSafe/sdk
  
 on:
   push:

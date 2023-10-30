@@ -8,9 +8,9 @@
   "repository": "git@github.com:daoism-systems/dSafe-SDK.git",
   "author": "Mihirsinh Parmar <mihirsinh.parmar.it@gmail.com>",
   "scripts": {
-    "lint": "eslint src/**/*.{js,ts,json}",
-    "lint:fix": "eslint --fix 'src/**/*.{js,ts,json}'",
-    "format": "prettier --write 'src/**/*.{js,ts,css,md,json}' --config ./.prettierrc",
+    "lint": "eslint src/**/*.{js,ts,json} test/**/*.{js,ts,json}",
+    "lint:fix": "eslint --fix 'src/**/*.{js,ts,json}' 'test/**/*.{js,ts,json}'",
+    "format": "prettier --write 'src/**/*.{js,ts,css,md,json}' 'test/**/*.{js,ts,json}' --config ./.prettierrc",
     "build": "tsup",
     "publish": "bash shell/publish.sh",
     "publish:npm": "yarn npm publish --access public",
