@@ -1,0 +1,13 @@
+{
+  "name": "@dSafe/sdk",
+  "version": "0.0.1",
+  "description": "A decentralised registry for Safe (Safe-Global) to replacce Safe's Safe Transaction API",
+  "main": "src/index.ts",
+  "repository": "git@github.com:daoism-systems/dSafe-SDK.git",
+  "author": "Mihirsinh Parmar <mihirsinh.parmar.it@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@changesets/cli": "^2.26.2"
+  },
+  "packageManager": "yarn@4.0.1"
+}

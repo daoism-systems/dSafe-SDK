@@ -68,6 +68,9 @@ typings/
 # Yarn Integrity file
 .yarn-integrity
 
+# Yarn install-state.gz
+install-state.gz
+
 # dotenv environment variables file
 .env
 .env.test
@@ -102,3 +105,5 @@ dist
 
 # TernJS port file
 .tern-port
+
+
