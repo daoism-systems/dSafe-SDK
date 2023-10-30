@@ -12,7 +12,8 @@
     "lint:fix": "eslint --fix 'src/**/*.{js,ts,json}'",
     "format": "prettier --write 'src/**/*.{js,ts,css,md,json}' --config ./.prettierrc",
     "build": "tsup",
-    "publish": "yarn npm publish --access public",
+    "publish": "bash shell/publish.sh",
+    "publish:npm": "yarn npm publish --access public",
     "test": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' mocha -r ts-node/register 'test/**/*.ts'"
   },
   "engines": {
