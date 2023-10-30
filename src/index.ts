@@ -1,1 +1,1 @@
-export default "Test: dSafe is going make Safe and fee";
+export default 'Test: dSafe is going make Safe and fee'
