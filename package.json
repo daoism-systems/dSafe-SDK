@@ -11,7 +11,8 @@
     "lint": "eslint src/**/*.{js,ts,json}",
     "lint:fix": "eslint --fix 'src/**/*.{js,ts,json}'",
     "format": "prettier --write 'src/**/*.{js,ts,css,md,json}' --config ./.prettierrc",
-    "build": "tsup"
+    "build": "tsup",
+    "publish": "yarn npm publish --access public"
   },
   "keywords": [
     "gnosis safe",
