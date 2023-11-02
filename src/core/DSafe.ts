@@ -1,6 +1,6 @@
 import { API_ENDPOINT } from '../config/constants'
 import Logger from '../utils/Logger.utils'
-import axios, { AxiosRequestConfig } from 'axios'
+import axios, { type AxiosResponse, type AxiosRequestConfig } from 'axios'
 import { throwError } from '../utils/error.utils'
 import { ERROR_CODE } from '../config/ERROR_CODES'
 const log = new Logger()
@@ -39,10 +39,10 @@ export default class DSafe {
    * @param payload payload/data/body to be sent to api route
    * @returns axios response after interacting with api route
    */
-  async fetchLegacy(httpMethod: 'POST' | 'GET' | 'DELETE', apiRoute: string, payload?: any) {
+  async fetchLegacy(httpMethod: 'POST' | 'GET' | 'DELETE', apiRoute: string, payload?: unknown): Promise<AxiosResponse> {
     log.info('Using Safe Transaction API instead of DSafe Registry. API Route:', [apiRoute])
     const apiUrl = this.generateApiUrl(apiRoute)
-    let options: AxiosRequestConfig = {}
+    const options: AxiosRequestConfig = {}
     options.method = httpMethod
     options.url = apiUrl
     if (payload !== undefined) {

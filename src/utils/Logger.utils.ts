@@ -10,7 +10,7 @@ export default class Logger {
    * @param message Message to be logged
    * @param extras Array of variables to be logged
    */
-  private log(logType: string, message: string, extras: Array<any>): void {
+  private log(logType: string, message: string, extras: unknown[]): void {
     console.log(`-------------------${logType} START-------------------`)
     console.log(`${message}`, ...extras)
     console.log(`--------------------${logType} END--------------------`)
@@ -21,7 +21,7 @@ export default class Logger {
    * @param message message to be displayed
    * @param extras array of any variables to be logged
    */
-  info(message: string, extras: Array<any>): void {
+  info(message: string, extras: unknown[]): void {
     this.log(this.LogTypes.INFO, message, extras)
   }
 
@@ -30,7 +30,7 @@ export default class Logger {
    * @param message error message
    * @param extras any variables to log
    */
-  error(message: string, extras: Array<any>): void {
+  error(message: string, extras: unknown[]): void {
     this.log(this.LogTypes.ERROR, message, extras)
   }
 }
