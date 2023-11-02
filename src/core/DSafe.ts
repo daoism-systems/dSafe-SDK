@@ -39,7 +39,11 @@ export default class DSafe {
    * @param payload payload/data/body to be sent to api route
    * @returns axios response after interacting with api route
    */
-  async fetchLegacy(httpMethod: 'POST' | 'GET' | 'DELETE', apiRoute: string, payload?: unknown): Promise<AxiosResponse> {
+  async fetchLegacy(
+    httpMethod: 'POST' | 'GET' | 'DELETE',
+    apiRoute: string,
+    payload?: unknown,
+  ): Promise<AxiosResponse> {
     log.info('Using Safe Transaction API instead of DSafe Registry. API Route:', [apiRoute])
     const apiUrl = this.generateApiUrl(apiRoute)
     const options: AxiosRequestConfig = {}

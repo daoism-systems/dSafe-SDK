@@ -20,7 +20,7 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
   })
   it('DSafe instance is initialised with correct chain ID', () => {
     // @eslint-ignore
-    expect(dsafe.initialised).to.be.true;
+    expect(dsafe.initialised).to.be.true
   })
   it('Should generate correct API URL', () => {
     expect(dsafe.generateApiUrl(demoApiRouteWithoutSlash)).to.equal(
