@@ -1,5 +1,5 @@
 {
-  "name": "@dSafe/sdk",
+  "name": "@dsafe/sdk",
   "version": "0.0.1",
   "description": "A decentralised registry for Safe (Safe-Global) to replacce Safe's Safe Transaction API",
   "main": "./dist/index.js",
@@ -53,5 +53,8 @@
     "tsup": "^7.2.0",
     "typescript": "^5.2.2"
   },
-  "packageManager": "yarn@4.0.1"
+  "packageManager": "yarn@4.0.1",
+  "dependencies": {
+    "axios": "^1.6.0"
+  }
 }

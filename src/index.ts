@@ -1,1 +1,3 @@
-export default 'Test: dSafe is going make Safe and fee'
+import DSafe from './core/DSafe'
+
+export default DSafe

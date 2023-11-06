@@ -1,4 +1,51 @@
-# SafeDB-SDK
+# DSafe-SDK
+
+## Install
+
+## Using `yarn` or `npm`
+```
+// using yarn
+yarn add @dsafe/sdk
+
+// using npm
+npm install @dsafe/sdk
+```
+
+## Build Locally
+### Clone
+```
+// clone using ssh
+git clone git@github.com:daoism-systems/dSafe-SDK.git
+
+// clone using https
+git clone https://github.com/daoism-systems/dSafe-SDK.git
+```
+
+### Build
+```
+// using yarn
+yarn install
+
+// using npm
+npm install
+```
+
+## Usage
+### Instantiate dSafe class
+```typescript
+import DSafe from "@dsafe/sdk"
+
+// instantiae
+const dsafe = new DSafe();
+```
+
+### Interact with Safe Client Gateway for routes that are not implemented yet
+```typescript
+const apiRoute = '/about/';
+const response: AxiosResponse = await dsafe.fetchLegacy('GET', apiRoute);
+
+// ... do something with response
+```
 
 ## Docs:
 1. [Technical Specification Document](https://docs.google.com/document/d/1zqZB8sIdhLuZWoqa2mWrcNSx7H7trtcxRHwgT_UiVA4/edit?usp=sharing)
