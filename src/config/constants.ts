@@ -11,3 +11,5 @@ export const API_NETWORKS: SAFE_API_NETWORK = {
 }
 
 export const STATUS_CODE_200 = 200
+
+export const STATUS_CODE_400 = 400

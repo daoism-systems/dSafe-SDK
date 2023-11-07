@@ -56,7 +56,12 @@ export default class DSafe {
     if (payload !== undefined) {
       options.data = payload
     }
-    const result = await axios.request(options)
-    return result
+    try {
+      const result = await axios.request(options)
+      return result
+    } catch (e) {
+      console.log(e)
+      throw e
+    }
   }
 }
