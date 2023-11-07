@@ -1,6 +1,6 @@
 {
   "name": "@dsafe/sdk",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A decentralised registry for Safe (Safe-Global) to replacce Safe's Safe Transaction API",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -37,6 +37,7 @@
     "@typescript-eslint/eslint-plugin": "^6.4.0",
     "@typescript-eslint/parser": "^6.9.0",
     "chai": "^4.3.10",
+    "dotenv": "^16.3.1",
     "eslint": "^8.0.1",
     "eslint-config-prettier": "^9.0.0",
     "eslint-config-standard-with-typescript": "^39.1.1",
@@ -45,6 +46,7 @@
     "eslint-plugin-n": "^15.0.0 || ^16.0.0 ",
     "eslint-plugin-prettier": "^5.0.1",
     "eslint-plugin-promise": "^6.0.0",
+    "ethers": "^6.8.1",
     "mocha": "^10.2.0",
     "nyc": "^15.1.0",
     "prettier": "^3.0.3",
