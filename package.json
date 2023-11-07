@@ -1,6 +1,6 @@
 {
   "name": "@dsafe/sdk",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A decentralised registry for Safe (Safe-Global) to replacce Safe's Safe Transaction API",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
