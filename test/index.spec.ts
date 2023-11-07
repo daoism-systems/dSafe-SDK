@@ -53,7 +53,8 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
     // add delegate
     const apiRoute = 'v1/delegates/' // add trailing forward slash to prevent server from doing GET
 
-    // generate signature to add delegate
+    if(PRIVATE_KEY !== undefined) {
+      // generate signature to add delegate
     const TOTP = Math.floor(Math.floor(Date.now() / 1000) / 3600)
     const messageToSign = `${delegateAddress}${TOTP.toString()}`
     if (PRIVATE_KEY === undefined) {
@@ -72,6 +73,7 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
     }
     const postResult = await dsafe.fetchLegacy('POST', apiRoute, payload)
     expect(postResult.status).not.equal(STATUS_CODE_400)
+    }
 
     // get delegate
     const delegates = await dsafe.fetchLegacy('GET', `${apiRoute}?safe=${testSafeOnGoerli}`)
