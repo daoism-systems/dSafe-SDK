@@ -9,25 +9,24 @@ const log = new Logger()
 const expect = chai.expect
 
 describe('DSafe: Forward API request to Safe API endpoint', () => {
-  const chainId = NETWORKS.GOERI
+  const chainId: string = NETWORKS.OP
   let dsafe: DSafe
   const demoApiRouteWithoutSlash: string = 'sendTransactions'
   const demoApiRouteWithSlash: string = '/sendTransactions'
   const testAccountOnGoerli = '0x9cA70B93CaE5576645F5F069524A9B9c3aef5006'
   const emptyApi: string = ''
   beforeEach('>> Instantiate Dsafe instance', () => {
-    dsafe = new DSafe()
+    dsafe = new DSafe(chainId)
   })
   it('DSafe instance is initialised with correct chain ID', () => {
-    // @eslint-ignore
     expect(dsafe.initialised).to.be.true
   })
   it('Should generate correct API URL', () => {
     expect(dsafe.generateApiUrl(demoApiRouteWithoutSlash)).to.equal(
-      `${API_ENDPOINT}/${demoApiRouteWithoutSlash}`,
+      `${API_ENDPOINT(chainId)}/${demoApiRouteWithoutSlash}`,
     )
     expect(dsafe.generateApiUrl(demoApiRouteWithSlash)).to.equal(
-      `${API_ENDPOINT}${demoApiRouteWithSlash}`,
+      `${API_ENDPOINT(chainId)}${demoApiRouteWithSlash}`,
     )
   })
   it('Should throw error if api route is empty string', () => {
@@ -35,11 +34,11 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
     expect(wrappedFunction).to.throw(ERROR_CODE.API_ROUTE_PROVIDED_EMPTY)
   })
   it('Should get about the API', async () => {
-    const result = await dsafe.fetchLegacy('GET', '/about')
+    const result = await dsafe.fetchLegacy('GET', 'v1/about')
     expect(result.status).to.equal(STATUS_CODE_200)
   })
   it('should fetch all the safes of an owner', async () => {
-    const apiRoute = `/v1/chains/${chainId}/owners/${testAccountOnGoerli}/safes`
+    const apiRoute = `/v1/owners/${testAccountOnGoerli}/safes`
     const result = await dsafe.fetchLegacy('GET', apiRoute)
     log.info('Data returned from API:', [result.data])
     expect(result.status).to.equal(STATUS_CODE_200)

@@ -7,9 +7,11 @@ const log = new Logger()
 
 export default class DSafe {
   initialised: boolean = false
+  network: string = ''
 
-  constructor() {
+  constructor(network: string) {
     this.initialised = true
+    this.network = network
     log.info('DSafe SDK initialised. Chain ID:', [])
   }
 
@@ -18,11 +20,11 @@ export default class DSafe {
    * @param apiRoute endpoint route eg. '/about' etc.
    * @returns generated API URL to interact with Server
    */
-  generateApiUrl(apiRoute: string): string {
+  generateApiUrl(apiRoute: string, network?: string): string {
     if (apiRoute === '') {
       throwError(ERROR_CODE.API_ROUTE_PROVIDED_EMPTY)
     }
-    let apiUrl: string = API_ENDPOINT
+    let apiUrl: string = API_ENDPOINT(network ?? this.network)
     if (apiRoute[0] === '/') {
       apiUrl = `${apiUrl}${apiRoute}`
     } else {
@@ -43,9 +45,11 @@ export default class DSafe {
     httpMethod: 'POST' | 'GET' | 'DELETE',
     apiRoute: string,
     payload?: unknown,
+    network?: string,
   ): Promise<AxiosResponse> {
     log.info('Using Safe Transaction API instead of DSafe Registry. API Route:', [apiRoute])
-    const apiUrl = this.generateApiUrl(apiRoute)
+    const apiUrl = this.generateApiUrl(apiRoute, network)
+    log.info('Fetch route:', [apiUrl])
     const options: AxiosRequestConfig = {}
     options.method = httpMethod
     options.url = apiUrl
