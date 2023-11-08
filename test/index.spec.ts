@@ -20,6 +20,26 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
   const testAccountOnGoerli = '0x9cA70B93CaE5576645F5F069524A9B9c3aef5006'
   const testSafeOnGoerli = '0xa192aBe4667FC4d11e46385902309cd7421997ed'
   const delegateAddress = '0xADC81e65845cEca5B928fdd484A38B98E5f418B0'
+  const testUsdt = "0xC11F33798F500bE942Ff2CA122790c2dc7c087E1"
+  const totalSupplyAbi = [{
+    "constant": true,
+    "inputs": [
+        {
+            "name": "_owner",
+            "type": "address"
+        }
+    ],
+    "name": "balanceOf",
+    "outputs": [
+        {
+            "name": "balance",
+            "type": "uint256"
+        }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+}];
   const emptyApi: string = ''
   beforeEach('>> Instantiate Dsafe instance', () => {
     dsafe = new DSafe(chainId)
@@ -82,4 +102,14 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
     )
     expect(delegates.data.results[delegateExist].delegate).to.equal(delegateAddress)
   }).timeout(100000)
+  it("should use dSafe registry for Data decoder", async () => {
+    const decodeDataroute = 'v1/data-decoder/'
+    const usdt = new ethers.Contract(testUsdt, totalSupplyAbi);
+    const encodedData = usdt.interface.encodeFunctionData("balanceOf",[testAccountOnGoerli]);
+    const payload = {
+      data: encodedData
+    }
+    const result = await dsafe.fetchLegacy('POST', decodeDataroute, payload);
+    expect(result.data?.parameters[0].value).to.equal(testAccountOnGoerli);
+  })
 })

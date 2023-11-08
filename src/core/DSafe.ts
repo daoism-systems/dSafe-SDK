@@ -3,6 +3,7 @@ import Logger from '../utils/Logger.utils'
 import axios, { type AxiosResponse, type AxiosRequestConfig } from 'axios'
 import { throwError } from '../utils/error.utils'
 import { ERROR_CODE } from '../config/ERROR_CODES'
+import handleDSafeRequest from '../handlers/handler'
 const log = new Logger()
 
 export default class DSafe {
@@ -47,8 +48,8 @@ export default class DSafe {
     payload?: unknown,
     network?: string,
   ): Promise<AxiosResponse> {
-    log.info('Using Safe Transaction API instead of DSafe Registry. API Route:', [apiRoute])
     const apiUrl = this.generateApiUrl(apiRoute, network)
+    handleDSafeRequest(httpMethod, apiRoute, payload, network);
     log.info('Fetch route:', [apiUrl])
     const options: AxiosRequestConfig = {}
     options.method = httpMethod
