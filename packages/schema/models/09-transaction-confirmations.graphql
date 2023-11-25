@@ -1,0 +1,7 @@
+type Confirmation @loadModel(id: "$CONFIRMATION_ID") {
+    id: ID!
+}
+
+type Transaction @loadModel(id: "$TRANSACTION_ID") {
+  confirmations: [Confirmation] @relationFrom(model: "Confirmation", property: "signerID") # int in SQL
+}

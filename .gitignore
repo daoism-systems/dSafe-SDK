@@ -113,3 +113,6 @@ dist
 
 # Private Keys
 admin_seed.txt
+
+# mac finder extension
+.DS_Store

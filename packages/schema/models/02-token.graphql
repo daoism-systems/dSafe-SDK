@@ -1,0 +1,21 @@
+type Safe @loadModel(id: "$SAFE_ID") {
+    id: ID!
+}
+
+type Token 
+  @createModel(accountRelation: LIST, description: "Tokens held by Safe")
+  @createIndex(fields: [{ path: ["tokenAddress"] }]) 
+  @createIndex(fields: [{ path: ["network"] }]) 
+  @createIndex(fields: [{ path: ["name"] }]) 
+  @createIndex(fields: [{ path: ["symbol"] }]) 
+{
+  tokenAddress: String! @string(maxLength: 42  minLength: 42) # bytea in SQL
+  safe: Safe! @string(maxLength: 42  minLength: 42) @relationDocument(property: "safeId") # bytea in SQL
+  safeId: StreamID! @documentReference(model: "Safe")
+  network: ChainID! # varchar(50) in SQL
+  name: String! @string(maxLength: 50) # string in SQL
+  symbol: String! @string(maxLength: 50) # string in SQL
+  decimals: Int! # int in SQL
+  logoUri: URI! # string in SQL
+  balance: String! @string(maxLength: 80) # string in SQL
+}

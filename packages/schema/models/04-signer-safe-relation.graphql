@@ -1,0 +1,21 @@
+type Signer @loadModel(id: "$SIGNER_ID") {
+    id: ID!
+}
+
+type Safe @loadModel(id: "$SAFE_ID") {
+    id: ID!
+}
+
+type SignerSafeRelationship 
+  @createModel(accountRelation: LIST, description: "Safe and Signer relationship")
+  @createIndex(fields: [{ path: ["signerID"] }])
+  @createIndex(fields: [{ path: ["safeID"] }])
+  @createIndex(fields: [{ path: ["network"] }])
+{
+  signerID: StreamID! @documentReference(model: "Signer")
+  signer: Signer! @relationDocument(property: "signerID")
+  safeID: StreamID! @documentReference(model: "Safe")
+  safe: Safe! @relationDocument(property: "safeID")
+  network: ChainID! # varchar(50) in SQL
+  blockWhenAdded: Int! # int in SQL
+}
