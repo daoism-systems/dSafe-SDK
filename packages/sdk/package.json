@@ -1,0 +1,53 @@
+{
+  "name": "@dsafe/sdk",
+  "version": "0.0.2",
+  "description": "A decentralised registry for Safe (Safe-Global) to replacce Safe's Safe Transaction API",
+  "exports": "./dist/index.js",
+  "type": "module",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "repository": {
+    "url": "git@github.com:daoism-systems/dSafe-SDK.git",
+    "directory": "packages/sdk"
+  },
+  "author": "Mihirsinh Parmar <mihirsinh.parmar.it@gmail.com>",
+  "scripts": {
+    "build": "tsup",
+    "publish": "bash shell/publish.sh",
+    "publish:npm": "yarn npm publish --access public",
+    "test": "mocha -r ts-node/register 'test/**/*.ts'",
+    "coverage": "nyc yarn test",
+    "tsnode": "ts-node --esm"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "gnosis safe",
+    "decentralised safe registry",
+    "dsafe sdk"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "@istanbuljs/nyc-config-typescript": "^1.0.2",
+    "@types/chai": "^4.3.9",
+    "@types/mocha": "^10.0.3",
+    "@types/node": "^20.8.9",
+    "@types/sinon": "^10.0.20",
+    "chai": "^4.3.10",
+    "dotenv": "^16.3.1",
+    "eslint": "^8.0.1",
+    "ethers": "^6.8.1",
+    "mocha": "^10.2.0",
+    "nyc": "^15.1.0",
+    "ora": "^7.0.1",
+    "sinon": "^17.0.0",
+    "ts-node": "^10.9.1",
+    "tsup": "^7.2.0",
+    "typescript": "^5.2.2"
+  },
+  "packageManager": "yarn@3.6.4",
+  "dependencies": {
+    "axios": "^1.6.0"
+  }
+}

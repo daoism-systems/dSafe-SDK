@@ -1,9 +1,9 @@
-import { API_ENDPOINT } from '../config/constants'
-import Logger from '../utils/Logger.utils'
+import { API_ENDPOINT } from '../config/constants.js'
+import Logger from '../utils/Logger.utils.js'
 import axios, { type AxiosResponse, type AxiosRequestConfig } from 'axios'
-import { throwError } from '../utils/error.utils'
-import { ERROR_CODE } from '../config/ERROR_CODES'
-import handleDSafeRequest from '../handlers/handler'
+import { throwError } from '../utils/error.utils.js'
+import { ERROR_CODE } from '../config/ERROR_CODES.js'
+import handleDSafeRequest from '../handlers/handler.js'
 const log = new Logger()
 
 export default class DSafe {
@@ -49,7 +49,7 @@ export default class DSafe {
     network?: string,
   ): Promise<AxiosResponse> {
     const apiUrl = this.generateApiUrl(apiRoute, network)
-    handleDSafeRequest(httpMethod, apiRoute, payload, network);
+    handleDSafeRequest(httpMethod, apiRoute, payload, network)
     log.info('Fetch route:', [apiUrl])
     const options: AxiosRequestConfig = {}
     options.method = httpMethod
