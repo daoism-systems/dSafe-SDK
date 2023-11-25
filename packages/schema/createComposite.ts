@@ -1,5 +1,4 @@
 import { readFileSync } from 'fs'
-import dotenv from 'dotenv'
 import { CeramicClient } from '@ceramicnetwork/http-client'
 import {
   createComposite,
@@ -20,7 +19,6 @@ import {
   OUT_JS_DIR,
   SCHEMA_FILES_DIRECTORIES,
 } from './constants.js'
-dotenv.config({ path: './.env' })
 
 const spinner = ora()
 CeramicClient

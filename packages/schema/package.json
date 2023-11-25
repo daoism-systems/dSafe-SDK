@@ -1,9 +1,29 @@
 {
   "name": "@dsafe/schema",
+  "version": "0.0.1",
   "type": "module",
+  "description": "Model and Composite for dSafe registry deployed on Ceramic using ComposeDB",
+  "repository": {
+    "url": "git@github.com:daoism-systems/dSafe-SDK.git",
+    "directory": "packages/sdk"
+  },
+  "author": "Mihirsinh Parmar <mihirsinh.parmar.it@gmail.com>",
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "gnosis safe",
+    "decentralised safe registry",
+    "dsafe sdk",
+    "ceramic",
+    "composedb"
+  ],
+  "license": "MIT",
   "packageManager": "yarn@3.6.4",
   "scripts": {
-    "tsnode": "ts-node --esm"
+    "tsnode": "ts-node --esm",
+    "create:composite": "yarn tsnode createComposite.ts",
+    "deploy": "bash shell/deploy.sh"
   },
   "devDependencies": {
     "@types/node": "^20.10.0",

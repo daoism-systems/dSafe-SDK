@@ -12,5 +12,10 @@
 
 2. Create composite using
    ```
-   yarn tsnode createComposite.ts
+   yarn deploy --environment [dev|staging|prod] --private-key [value] [--ceramic-url [value]]
+   ```
+
+   To find more information about the command, run:
+   ```
+   yarn deploy [--help|-h]
    ```

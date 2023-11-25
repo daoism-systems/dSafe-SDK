@@ -1,4 +1,4 @@
-export const SCHMEA_DIRECTORY = './models/schema'
+export const SCHMEA_DIRECTORY = './models'
 
 export const SCHEMA_FILES_DIRECTORIES = {
   SAFE: `${SCHMEA_DIRECTORY}/01-safe.graphql`,
@@ -23,11 +23,13 @@ export const ID_VARIABLE_NAMES = {
   CONFIRMATION_ID: 'CONFIRMATION_ID',
 }
 
-export const CERAMIC_NODE_URL = 'http://localhost:7007'
+export const CERAMIC_NODE_URL = process.env.CERAMIC_NODE_URL
+export const ENVIRONMENT = process.env.ENVIRONMENT
+export const PRIVATE_KEY = process.env.PRIVATE_KEY
 
 const OUTPUT_DIRECTORY = 'out/__generated__'
 
-const OUTPUT_FILE_NAME = 'definitions'
+const OUTPUT_FILE_NAME = `definitions.${ENVIRONMENT}`
 const OUTPUT_JSON_FILE = `${OUTPUT_FILE_NAME}.json`
 const OUTPUT_JS_FILE = `${OUTPUT_FILE_NAME}.js`
 

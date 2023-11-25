@@ -10,7 +10,8 @@
     "lint:fix": "eslint --fix 'packages/**/*.{js,ts}'",
     "format": "prettier --write 'packages/**/*.{js,ts,css,md,json}' --config ./.prettierrc",
     "sdk": "yarn workspace @dsafe/sdk",
-    "schema": "yarn workspace @dsafe/schema"
+    "schema": "yarn workspace @dsafe/schema",
+    "deploy": "yarn schema run deploy"
   },
   "workspaces": [
     "packages/*"
