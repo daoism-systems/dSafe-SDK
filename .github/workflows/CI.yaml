@@ -28,7 +28,7 @@ jobs:
         run: yarn
       
       - name: Compile
-        run: yarn build
+        run: yarn turbo run build
   
   lint:
     name: lint typescript
@@ -51,7 +51,7 @@ jobs:
         run: yarn
  
       - name: Lint all packagess
-        run: yarn lint
+        run: yarn turbo run lint
     
   coverage:
     name: coverage and test
@@ -74,8 +74,8 @@ jobs:
         run: yarn
  
       - name: Test
-        run: yarn test
+        run: yarn turbo run  test
  
       - name: Coverage of tests
-        run: yarn coverage
+        run: yarn turbo run coverage
     

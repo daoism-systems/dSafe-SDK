@@ -6,6 +6,8 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 
+.yarn/cache
+
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
@@ -106,4 +108,15 @@ dist
 # TernJS port file
 .tern-port
 
+# Turbo files
+.turbo/
 
+# Private Keys
+admin_seed.txt
+
+# mac finder extension
+.DS_Store
+
+# Ignore Cermaic Generated schemas
+**.dev.json
+**.dev.js

@@ -1,4 +1,4 @@
-import { type SAFE_API_NETWORK } from '../types/SAFE_API_NETWORK.types'
+import { type SAFE_API_NETWORK } from '../types/SAFE_API_NETWORK.types.js'
 
 // Safe Transaction API endpoint
 export const API_ENDPOINT = (network: string): string =>

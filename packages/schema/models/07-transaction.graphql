@@ -1,0 +1,32 @@
+type Safe @loadModel(id: "$SAFE_ID") {
+    id: ID!
+}
+
+type Transaction
+  @createModel(accountRelation: LIST, description: "Safe Transaction")
+  @createIndex(fields: [{ path: ["safeTransactionHash"] }])
+  @createIndex(fields: [{ path: ["executor"] }])
+  @createIndex(fields: [{ path: ["network"] }])
+  @createIndex(fields: [{ path: ["to"] }])
+  @createIndex(fields: [{ path: ["nonce"] }])
+  @createIndex(fields: [{ path: ["safeID"] }])
+{
+  safeTransactionHash: String! @string(maxLength: 66  minLength: 66) # bytea in SQL
+  executor: String @string(maxLength: 42  minLength: 42) # bytea in SQL
+  to: String! @string(maxLength: 42  minLength: 42) # bytea in SQL
+  gas: Int! # int in SQL
+  gasPrice: Int! # int in SQL
+  baseGasPrice: Int! # int in SQL
+  refundReceiver: String! @string(maxLength: 42  minLength: 42) # bytea in SQL
+  trxHash: String @string(maxLength: 66  minLength: 66) # bytea in SQL
+  data: String! @string(maxLength: 999999999) # 12 MB of data (Size of 1 block on ETH)
+  operation: String! @string(maxLength: 1) # string in SQL
+  gasToken: String! @string(maxLength: 42  minLength: 42) # bytea in SQL
+  nonce: Int! # int in SQL
+  sender: String! @string(maxLength: 42  minLength: 42) # bytea in SQL
+  signature: String! @string(maxLength: 13200  minLength: 132) # string in SQL
+  origin: String! @string(maxLength: 13200) # string in SQL
+  safeID: StreamID! @documentReference(model: "Safe")
+  safe: Safe! @relationDocument(property: "safeID")
+  network: ChainID! # varchar(50) in SQL
+}

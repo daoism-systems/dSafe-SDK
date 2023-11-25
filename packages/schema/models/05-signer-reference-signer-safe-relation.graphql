@@ -1,0 +1,7 @@
+type SignerSafeRelationship @loadModel(id: "$SIGNER_SAFE_RELATIONSHIP_ID") {
+    id: ID!
+}
+
+type Signer @loadModel(id: "$SIGNER_ID") {
+  signerSafeRelations: [SignerSafeRelationship] @relationFrom(model: "SignerSafeRelationship", property: "signerID")
+}

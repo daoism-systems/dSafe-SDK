@@ -1,0 +1,22 @@
+type Safe @loadModel(id: "$SAFE_ID") {
+    id: ID!
+}
+
+type Signer @loadModel(id: "$SIGNER_ID") {
+    id: ID!
+}
+
+type Delegate
+  @createModel(accountRelation: LIST, description: "Delegates of a Safe")
+  @createIndex(fields: [{ path: ["delegate"] }])
+  @createIndex(fields: [{ path: ["safeID"] }])
+  @createIndex(fields: [{ path: ["network"] }])
+  @createIndex(fields: [{ path: ["delegatorID"] }])
+{
+  delegate: String! @string(maxLength: 42  minLength: 42) # bytea in SQL
+  network: ChainID! # varchar(50) in SQL
+  safeID: StreamID! @documentReference(model: "Safe")
+  safe: Safe! @relationDocument(property: "safeID")
+  delegatorID: StreamID! @documentReference(model: "Signer")
+  delegator: Signer! @relationDocument(property: "delegatorID")
+}

@@ -1,4 +1,4 @@
-import Logger from './Logger.utils'
+import Logger from './Logger.utils.js'
 const log = new Logger()
 
 export function throwError(errorMessage: string, e?: Error): void {

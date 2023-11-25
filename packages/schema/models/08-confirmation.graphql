@@ -1,0 +1,19 @@
+type Transaction @loadModel(id: "$TRANSACTION_ID") {
+    id: ID!
+}
+
+type Signer @loadModel(id: "$SIGNER_ID") {
+    id: ID!
+}
+
+type Confirmation
+  @createModel(accountRelation: LIST, description: "Confirmations of a transactions of Safe")
+  @createIndex(fields: [{ path: ["signerID"] }])
+  @createIndex(fields: [{ path: ["transactionId"] }])
+{
+  signerID: StreamID! @documentReference(model: "Signer")
+  signer: Signer! @relationDocument(property: "signerID")
+  transactionId: StreamID! @documentReference(model: "Transaction")
+  safeTransactionHash: Transaction! @relationDocument(property: "transactionId") # bytea in SQL
+  signature: String! @string(maxLength: 132  minLength: 132) # bytea in SQL
+}

@@ -1,0 +1,6 @@
+type Signer
+  @createModel(accountRelation: LIST, description: "Signer of a Safe")
+  @createIndex(fields: [{ path: ["signer"] }])
+{
+  signer: String! @string(maxLength: 42  minLength: 42) # bytea in SQL
+}
