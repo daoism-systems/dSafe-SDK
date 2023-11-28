@@ -24,7 +24,9 @@
     "tsnode": "ts-node --esm",
     "create:composite": "yarn tsnode createComposite.ts",
     "deploy": "bash shell/deploy.sh",
-    "share:definitions": "yarn tsnode moveDefinitions.ts"
+    "share:definitions": "yarn tsnode moveDefinitions.ts",
+    "script:startGraphql": "yarn tsnode runGraphql.ts",
+    "start:graphql": "bash shell/run_graphql.sh"
   },
   "devDependencies": {
     "@types/node": "^20.10.0",
@@ -36,6 +38,7 @@
     "@ceramicnetwork/http-client": "^3.0.4",
     "@composedb/devtools": "^0.5.1",
     "@composedb/devtools-node": "^0.5.2",
+    "@composedb/types": "^0.5.1",
     "@types/ora": "^3.2.0",
     "dids": "^4.0.4",
     "key-did-provider-ed25519": "^3.0.2",
