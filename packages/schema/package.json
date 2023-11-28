@@ -23,7 +23,8 @@
   "scripts": {
     "tsnode": "ts-node --esm",
     "create:composite": "yarn tsnode createComposite.ts",
-    "deploy": "bash shell/deploy.sh"
+    "deploy": "bash shell/deploy.sh",
+    "share:definitions": "yarn tsnode moveDefinitions.ts"
   },
   "devDependencies": {
     "@types/node": "^20.10.0",

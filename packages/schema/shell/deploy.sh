@@ -90,3 +90,6 @@ export PRIVATE_KEY=$privateKey
 
 # Run the Node.js script
 yarn create:composite
+
+# Share definitions
+yarn share:definitions
