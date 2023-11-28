@@ -1,0 +1,22 @@
+mutation CreateDelegate($input: CreateDelegateInput!) {
+  createDelegate(input: $input) {
+    document {
+      delegate
+      network
+      safe {
+        edges {
+          node {
+            safeAddress
+          }
+        }
+      }
+      delegator {
+        edges {
+          node {
+            signer
+          }
+        }
+      }
+    }
+  }
+}

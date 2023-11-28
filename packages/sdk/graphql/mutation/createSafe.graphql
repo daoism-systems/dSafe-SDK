@@ -1,0 +1,13 @@
+mutation CreateSafe($input: CreateSafeInput!) {
+  createSafe(input: $input) {
+    document {
+      safeAddress
+      network
+      totalTransactions
+      singleton
+      deployedBlockNumber
+      nativeTokenBalance
+      threshold
+    }
+  }
+}

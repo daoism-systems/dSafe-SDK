@@ -1,0 +1,10 @@
+mutation CreateSignerSafeRelationship($input: CreateSignerSafeRelationshipInput!) {
+  createSignerSafeRelationship(input: $input) {
+    document {
+      signerID
+      safeID
+      network
+      blockWhenAdded
+    }
+  }
+}

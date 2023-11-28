@@ -1,0 +1,20 @@
+mutation CreateToken($input: CreateTokenInput!) {
+  createToken(input: $input) {
+    document {
+      tokenAddress
+      safe {
+        edges {
+          node {
+            safeAddress
+          }
+        }
+      }
+      network
+      name
+      symbol
+      decimals
+      logoUri
+      balance
+    }
+  }
+}
