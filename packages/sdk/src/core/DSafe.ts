@@ -36,7 +36,7 @@ export default class DSafe {
     log.info('DSafe SDK initialised. Chain ID and Ceramic Node URL', [network, ceramicNodeUrlToUse]);
   }
 
-  initializeDIDOnNode(privateKey: string) {
+  async initializeDIDOnNode(privateKey: string) {
     // authenticate
     // const ethProvider = provider;
     // const addresses = await ethProvider.request({ method: 'eth_requestAccounts' })
@@ -47,6 +47,7 @@ export default class DSafe {
     // this.composeClient.setDID(session.did)
 
     // generate DID
+    console.log(privateKey);
     if (privateKey === '') {
       console.log('Private key cannot be empty')
       throw Error('Private Key empty!')
@@ -56,6 +57,7 @@ export default class DSafe {
       resolver: getResolver(),
       provider: new Ed25519Provider(key),
     });
+    await did.authenticate();
     this.did = did;
     this.composeClient.setDID(did);
   }
