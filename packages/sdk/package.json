@@ -15,7 +15,7 @@
     "build": "tsup",
     "publish": "bash shell/publish.sh",
     "publish:npm": "yarn npm publish --access public",
-    "test": "mocha -r ts-node/register 'test/**/*.ts' --exit",
+    "test": "mocha -r ts-node/register 'test/**/*.ts' --exit --timeout 10000",
     "coverage": "c8 --all  yarn test",
     "tsnode": "ts-node --esm"
   },
@@ -48,6 +48,14 @@
   },
   "packageManager": "yarn@3.6.4",
   "dependencies": {
-    "axios": "^1.6.0"
+    "@ceramicnetwork/http-client": "^3.0.5",
+    "@composedb/client": "^0.5.2",
+    "@composedb/devtools-node": "^0.5.2",
+    "@composedb/types": "^0.5.1",
+    "axios": "^1.6.0",
+    "dids": "^4.0.4",
+    "key-did-provider-ed25519": "^3.0.2",
+    "key-did-resolver": "^3.0.0",
+    "uint8arrays": "^4.0.9"
   }
 }

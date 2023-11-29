@@ -1,4 +1,4 @@
-import { type SAFE_API_NETWORK } from '../types/SAFE_API_NETWORK.types.js'
+import { CeramicNetwork, type SAFE_API_NETWORK } from '../types/SAFE_API_NETWORK.types.js'
 
 // Safe Transaction API endpoint
 export const API_ENDPOINT = (network: string): string =>
@@ -8,6 +8,12 @@ export const API_NETWORKS: SAFE_API_NETWORK = {
   mainnet: 'mainnet',
   goerli: 'goerli',
   optimism: 'optimism',
+}
+
+export const CERAMIC_NETWORKS: CeramicNetwork = {
+  local: 'http://localhost:7007',
+  testnet: '',
+  mainnet: ''
 }
 
 export const STATUS_CODE_200 = 200

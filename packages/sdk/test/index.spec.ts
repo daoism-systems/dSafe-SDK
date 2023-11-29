@@ -15,6 +15,7 @@ const PRIVATE_KEY = process.env.PRIVATE_KEY
 describe('DSafe: Forward API request to Safe API endpoint', () => {
   const chainId: string = NETWORKS.GOERLI
   let dsafe: DSafe
+  const ceramicNodeNetwork = 'local';
   const demoApiRouteWithoutSlash: string = 'sendTransactions'
   const demoApiRouteWithSlash: string = '/sendTransactions'
   const testAccountOnGoerli = '0x9cA70B93CaE5576645F5F069524A9B9c3aef5006'
@@ -44,10 +45,22 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
   ]
   const emptyApi: string = ''
   beforeEach('>> Instantiate Dsafe instance', () => {
-    dsafe = new DSafe(chainId)
+    dsafe = new DSafe(chainId, ceramicNodeNetwork);
   })
   it('DSafe instance is initialised with correct chain ID', () => {
+    expect(dsafe.ceramicClient).to.not.be.undefined;
+    expect(dsafe.composeClient).to.not.be.undefined;
     expect(dsafe.initialised).to.be.true
+  })
+  it('Dsafe fails when private key is empty', () => {
+    expect(()=>dsafe.initializeDIDOnNode('')).to.throws("Private Key empty!");
+  })
+  it('Dsafe safely generates DID on Node', () => {
+    expect(dsafe.did).to.be.undefined;
+    expect(dsafe.composeClient.did).to.be.undefined;
+    dsafe.initializeDIDOnNode(PRIVATE_KEY as string);
+    expect(dsafe.composeClient.did).to.not.be.undefined;
+    expect(dsafe.did).to.not.be.undefined;
   })
   it('Should generate correct API URL', () => {
     expect(dsafe.generateApiUrl(demoApiRouteWithoutSlash)).to.equal(

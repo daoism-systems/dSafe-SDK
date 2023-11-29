@@ -1,19 +1,56 @@
-import { API_ENDPOINT } from '../config/constants.js'
+import { CeramicClient } from '@ceramicnetwork/http-client';
+import { ComposeClient } from "@composedb/client";
+import { API_ENDPOINT, CERAMIC_NETWORKS } from '../config/constants.js'
 import Logger from '../utils/Logger.utils.js'
 import axios, { type AxiosResponse, type AxiosRequestConfig } from 'axios'
 import { throwError } from '../utils/error.utils.js'
 import { ERROR_CODE } from '../config/ERROR_CODES.js'
 import handleDSafeRequest from '../handlers/handler.js'
+import { CeramicNetwork } from '../types/SAFE_API_NETWORK.types.js';
+import {definition} from "../../__generated__/definitions.dev.js";
+import { RuntimeCompositeDefinition } from "@composedb/types";
+import { fromString } from 'uint8arrays';
+import { DID } from 'dids';
+import { getResolver } from 'key-did-resolver';
+import { Ed25519Provider } from 'key-did-provider-ed25519';
 const log = new Logger()
 
 export default class DSafe {
   initialised: boolean = false
   network: string = ''
+  ceramicClient: CeramicClient;
+  composeClient: ComposeClient
+  did: DID | undefined;
 
-  constructor(network: string) {
+  constructor(network: string, ceramicNetwork: keyof CeramicNetwork, ceramicNetworkOverride?: string) {
+    const ceramicNodeUrlToUse = ceramicNetworkOverride === undefined ? CERAMIC_NETWORKS[ceramicNetwork] : ceramicNetworkOverride;
     this.initialised = true
     this.network = network
-    log.info('DSafe SDK initialised. Chain ID:', [])
+    this.ceramicClient = new CeramicClient(ceramicNodeUrlToUse);
+    this.composeClient = new ComposeClient({
+      ceramic: ceramicNodeUrlToUse,
+      definition: definition as RuntimeCompositeDefinition,
+    });
+    log.info('DSafe SDK initialised. Chain ID and Ceramic Node URL', [network, ceramicNodeUrlToUse]);
+  }
+
+  initializeDIDOnNode(privateKey: string) {
+    // generate DID
+    if (privateKey === '') {
+      console.log('Private key cannot be empty')
+      throw Error('Private Key empty!')
+    }
+    const key = fromString(privateKey.toString().slice(2), 'base16')
+    const did = new DID({
+      resolver: getResolver(),
+      provider: new Ed25519Provider(key),
+    });
+    this.did = did;
+    this.composeClient.setDID(did);
+  }
+
+  initializeDIDOnClient() {
+
   }
 
   /**
