@@ -13,6 +13,8 @@ import { fromString } from 'uint8arrays';
 import { DID } from 'dids';
 import { getResolver } from 'key-did-resolver';
 import { Ed25519Provider } from 'key-did-provider-ed25519';
+import { DIDSession } from 'did-session'
+import { EthereumWebAuth, getAccountId } from '@didtools/pkh-ethereum'
 const log = new Logger()
 
 export default class DSafe {
@@ -35,6 +37,15 @@ export default class DSafe {
   }
 
   initializeDIDOnNode(privateKey: string) {
+    // authenticate
+    // const ethProvider = provider;
+    // const addresses = await ethProvider.request({ method: 'eth_requestAccounts' })
+    // const accountId = await getAccountId(ethProvider, addresses[0])
+    // const authMethod = await EthereumWebAuth.getAuthMethod(ethprovider, accountId)
+
+    // const session = await DIDSession.get(accountId, authMethod, { resources: this.composeClient.resources})
+    // this.composeClient.setDID(session.did)
+
     // generate DID
     if (privateKey === '') {
       console.log('Private key cannot be empty')
@@ -86,7 +97,11 @@ export default class DSafe {
     network?: string,
   ): Promise<AxiosResponse> {
     const apiUrl = this.generateApiUrl(apiRoute, network)
-    handleDSafeRequest(httpMethod, apiRoute, payload, network)
+    const status = await handleDSafeRequest(this.composeClient, httpMethod, apiRoute, payload, network)
+    if(status === false) {
+      log.error("DSafe request failed, execution stopped!", []);
+      throw Error("dSafe request failed");
+    }
     log.info('Fetch route:', [apiUrl])
     const options: AxiosRequestConfig = {}
     options.method = httpMethod

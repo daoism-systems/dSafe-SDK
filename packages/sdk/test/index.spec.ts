@@ -1,6 +1,7 @@
-import chai from 'chai'
+// import chai from 'chai'
 import dotenv from 'dotenv'
 import DSafe from '../src/index.js'
+import {describe, expect, test} from '@jest/globals';
 import { API_ENDPOINT, STATUS_CODE_200, STATUS_CODE_400 } from '../src/config/constants.js'
 import { ERROR_CODE } from '../src/config/ERROR_CODES.js'
 import NETWORKS from '../src/config/networks.js'
@@ -8,7 +9,7 @@ import Logger from '../src/utils/Logger.utils.js'
 import { ethers } from 'ethers'
 dotenv.config({ path: './.env' })
 const log = new Logger()
-const expect = chai.expect
+// const expect = chai.expect
 
 const PRIVATE_KEY = process.env.PRIVATE_KEY
 
@@ -44,46 +45,43 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
     },
   ]
   const emptyApi: string = ''
-  beforeEach('>> Instantiate Dsafe instance', () => {
+  beforeEach(() => {
+    log.info('>> Instantiate Dsafe instance', []);
     dsafe = new DSafe(chainId, ceramicNodeNetwork);
   })
   it('DSafe instance is initialised with correct chain ID', () => {
-    expect(dsafe.ceramicClient).to.not.be.undefined;
-    expect(dsafe.composeClient).to.not.be.undefined;
-    expect(dsafe.initialised).to.be.true
+    expect(dsafe.ceramicClient).toBeDefined();
+    expect(dsafe.composeClient).toBeDefined();
+    expect(dsafe.initialised).toBe(true)
   })
   it('Dsafe fails when private key is empty', () => {
-    expect(()=>dsafe.initializeDIDOnNode('')).to.throws("Private Key empty!");
+    expect(()=>dsafe.initializeDIDOnNode('')).toThrowError("Private Key empty!");
   })
   it('Dsafe safely generates DID on Node', () => {
-    expect(dsafe.did).to.be.undefined;
-    expect(dsafe.composeClient.did).to.be.undefined;
+    expect(dsafe.did).toBeUndefined();
+    expect(dsafe.composeClient.did).toBeUndefined();
     dsafe.initializeDIDOnNode(PRIVATE_KEY as string);
-    expect(dsafe.composeClient.did).to.not.be.undefined;
-    expect(dsafe.did).to.not.be.undefined;
+    expect(dsafe.composeClient.did).toBeDefined();
+    expect(dsafe.did).toBeDefined();
   })
   it('Should generate correct API URL', () => {
-    expect(dsafe.generateApiUrl(demoApiRouteWithoutSlash)).to.equal(
-      `${API_ENDPOINT(chainId)}/${demoApiRouteWithoutSlash}`,
-    )
-    expect(dsafe.generateApiUrl(demoApiRouteWithSlash)).to.equal(
-      `${API_ENDPOINT(chainId)}${demoApiRouteWithSlash}`,
-    )
+    expect(dsafe.generateApiUrl(demoApiRouteWithoutSlash)).toBe(`${API_ENDPOINT(chainId)}/${demoApiRouteWithoutSlash}`)
+    expect(dsafe.generateApiUrl(demoApiRouteWithSlash)).toBe(`${API_ENDPOINT(chainId)}${demoApiRouteWithSlash}`)
   })
   it('Should throw error if api route is empty string', () => {
     const wrappedFunction = (): string => dsafe.generateApiUrl(emptyApi)
-    expect(wrappedFunction).to.throw(ERROR_CODE.API_ROUTE_PROVIDED_EMPTY)
+    expect(wrappedFunction).toThrow(ERROR_CODE.API_ROUTE_PROVIDED_EMPTY)
   })
   it('Should get about the API', async () => {
     const result = await dsafe.fetchLegacy('GET', 'v1/about')
-    expect(result.status).to.equal(STATUS_CODE_200)
-  }).timeout(5000)
+    expect(result.status).toBe(STATUS_CODE_200)
+  }, 5000)
   it('should fetch all the safes of an owner', async () => {
     const apiRoute = `/v1/owners/${testAccountOnGoerli}/safes`
     const result = await dsafe.fetchLegacy('GET', apiRoute)
     log.info('Data returned from API:', [result.data])
-    expect(result.status).to.equal(STATUS_CODE_200)
-  }).timeout(5000)
+    expect(result.status).toBe(STATUS_CODE_200)
+  }, 5000)
   it('should post a new delegate to the safe', async () => {
     // add delegate
     const apiRoute = 'v1/delegates/' // add trailing forward slash to prevent server from doing GET
@@ -107,7 +105,7 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
         label: 'delegator',
       }
       const postResult = await dsafe.fetchLegacy('POST', apiRoute, payload)
-      expect(postResult.status).not.equal(STATUS_CODE_400)
+      expect(postResult.status).not.toBe(STATUS_CODE_400)
     }
 
     // get delegate
@@ -115,8 +113,8 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
     const delegateExist: number = delegates.data.results.findIndex(
       (element: any) => element.delegate === delegateAddress,
     )
-    expect(delegates.data.results[delegateExist].delegate).to.equal(delegateAddress)
-  }).timeout(100000)
+    expect(delegates.data.results[delegateExist].delegate).toBe(delegateAddress)
+  }, 100000)
   it('should use dSafe registry for Data decoder', async () => {
     const decodeDataroute = 'v1/data-decoder/'
     const usdt = new ethers.Contract(testUsdt, totalSupplyAbi)
@@ -125,6 +123,6 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
       data: encodedData,
     }
     const result = await dsafe.fetchLegacy('POST', decodeDataroute, payload)
-    expect(result.data?.parameters[0].value).to.equal(testAccountOnGoerli)
+    expect(result.data?.parameters[0].value).toBe(testAccountOnGoerli)
   })
 })
