@@ -37,17 +37,7 @@ export default class DSafe {
   }
 
   async initializeDIDOnNode(privateKey: string) {
-    // authenticate
-    // const ethProvider = provider;
-    // const addresses = await ethProvider.request({ method: 'eth_requestAccounts' })
-    // const accountId = await getAccountId(ethProvider, addresses[0])
-    // const authMethod = await EthereumWebAuth.getAuthMethod(ethprovider, accountId)
-
-    // const session = await DIDSession.get(accountId, authMethod, { resources: this.composeClient.resources})
-    // this.composeClient.setDID(session.did)
-
     // generate DID
-    console.log(privateKey);
     if (privateKey === '') {
       console.log('Private key cannot be empty')
       throw Error('Private Key empty!')

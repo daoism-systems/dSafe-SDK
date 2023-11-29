@@ -45,24 +45,27 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
     },
   ]
   const emptyApi: string = ''
-  beforeEach(() => {
+  beforeEach(async () => {
     log.info('>> Instantiate Dsafe instance', []);
     dsafe = new DSafe(chainId, ceramicNodeNetwork);
+    await dsafe.initializeDIDOnNode(PRIVATE_KEY as string);
   })
   it('DSafe instance is initialised with correct chain ID', () => {
     expect(dsafe.ceramicClient).toBeDefined();
     expect(dsafe.composeClient).toBeDefined();
     expect(dsafe.initialised).toBe(true)
   })
-  it('Dsafe fails when private key is empty', () => {
-    expect(()=>dsafe.initializeDIDOnNode('')).toThrowError("Private Key empty!");
+  it('Dsafe fails when private key is empty', async () => {
+    const newDsafe = new DSafe(chainId, ceramicNodeNetwork);
+    await expect(newDsafe.initializeDIDOnNode('')).rejects.toThrow("Private Key empty!");
   })
-  it('Dsafe safely generates DID on Node', () => {
-    expect(dsafe.did).toBeUndefined();
-    expect(dsafe.composeClient.did).toBeUndefined();
-    dsafe.initializeDIDOnNode(PRIVATE_KEY as string);
-    expect(dsafe.composeClient.did).toBeDefined();
-    expect(dsafe.did).toBeDefined();
+  it('Dsafe safely generates DID on Node', async () => {
+    const newDsafe = new DSafe(chainId, ceramicNodeNetwork);
+    expect(newDsafe.did).toBeUndefined();
+    expect(newDsafe.composeClient.did).toBeUndefined();
+    await newDsafe.initializeDIDOnNode(PRIVATE_KEY as string);
+    expect(newDsafe.composeClient.did).toBeDefined();
+    expect(newDsafe.did).toBeDefined();
   })
   it('Should generate correct API URL', () => {
     expect(dsafe.generateApiUrl(demoApiRouteWithoutSlash)).toBe(`${API_ENDPOINT(chainId)}/${demoApiRouteWithoutSlash}`)
@@ -124,5 +127,14 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
     }
     const result = await dsafe.fetchLegacy('POST', decodeDataroute, payload)
     expect(result.data?.parameters[0].value).toBe(testAccountOnGoerli)
+  })
+  it('should be able to create new transaction', async () => {
+    const createTransactionRoute = 'v1/create-transaction/';
+    const safeAddress = "0xa192aBe4667FC4d11e46385902309cd7421997ed";
+    const payload = {
+      safeAddress: safeAddress,
+      sender: testAccountOnGoerli,
+    };
+    const result = await dsafe.fetchLegacy("POST", createTransactionRoute, payload, chainId);
   })
 })

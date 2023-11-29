@@ -49,8 +49,9 @@ async function handleCreateTransaction(composeClient: ComposeClient, payload?: C
     throw Error("Please provide the network the safe is deployed on");
   }
   const safeExist = await checkSafeExists(payload.safeAddress,composeClient);
+  let safeStreamId: string | undefined = safeExist.id;
   console.log(safeExist);
-  if(!safeExist) {
+  if(!safeExist.exists) {
     console.log("Composing Safe");
     // get safe data from API Service
     const response = (await axios.get(`${API_ENDPOINT(network)}/v1/safes/${payload.safeAddress}`));
@@ -73,6 +74,9 @@ async function handleCreateTransaction(composeClient: ComposeClient, payload?: C
     }
     console.log("Creating new safe on ComposeDB...");
     await composeSafe(input, composeClient);
+    const safeCreated = await checkSafeExists(payload.safeAddress, composeClient);
+    console.log(`Safe Created: ${safeCreated.exists}`);
+    safeStreamId = safeCreated.id;
   }
   // for now, only focus on signer sending transaction
   const signerExist = await checkSignerExists(payload.sender, composeClient);
