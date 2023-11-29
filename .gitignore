@@ -120,3 +120,6 @@ admin_seed.txt
 # Ignore Cermaic Generated schemas
 **.dev.json
 **.dev.js
+
+# Ignore flattened GraphQL file
+99-dsafe-sdk.graphql
