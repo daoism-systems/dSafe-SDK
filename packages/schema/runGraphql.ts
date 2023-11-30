@@ -19,19 +19,19 @@ async function runGraphql() {
   const did = new DID({
     resolver: getResolver(),
     provider: new Ed25519Provider(key),
-  });
-  if(process.env.PORT_NUMBER === undefined) {
-    throw Error("Invalid Port Number");
+  })
+  if (process.env.PORT_NUMBER === undefined) {
+    throw Error('Invalid Port Number')
   }
-  if(process.env.FILE_PATH === undefined) {
-    throw Error("Invalid File Path");
+  if (process.env.FILE_PATH === undefined) {
+    throw Error('Invalid File Path')
   }
   const server = await serveEncodedDefinition({
-    ceramicURL: CERAMIC_NODE_URL ? CERAMIC_NODE_URL : "http://localhost:7007",
+    ceramicURL: CERAMIC_NODE_URL || 'http://localhost:7007',
     graphiql: true,
     path: process.env.FILE_PATH,
-    did: did,
-    port: parseInt(process.env.PORT_NUMBER)
+    did,
+    port: parseInt(process.env.PORT_NUMBER),
   })
 
   console.log(`Server started on http://localhost:${process.env.PORT_NUMBER}`)
