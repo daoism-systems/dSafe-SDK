@@ -1,8 +1,6 @@
-import { ComposeClient } from "@composedb/client";
+import { type ComposeClient } from '@composedb/client'
 
-interface CreateSafeInput {
-    [key: string]: any
-}
+type CreateSafeInput = Record<string, any>
 
 const COMPOSE_SAFE = () => `
 mutation CreateSafe($input: CreateSafeInput!) {
@@ -23,8 +21,10 @@ mutation CreateSafe($input: CreateSafeInput!) {
     }
   }`
 
-export async function composeSafe(input: CreateSafeInput, composeClient: ComposeClient): Promise<void> {
-    const executionResult = await composeClient.executeQuery(COMPOSE_SAFE(), {input});
-    console.log(executionResult);
+export async function composeSafe(
+  input: CreateSafeInput,
+  composeClient: ComposeClient,
+): Promise<void> {
+  const executionResult = await composeClient.executeQuery(COMPOSE_SAFE(), { input })
+  console.log(executionResult)
 }
-

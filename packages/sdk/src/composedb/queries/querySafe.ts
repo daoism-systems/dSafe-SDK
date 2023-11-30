@@ -1,4 +1,4 @@
-import { ComposeClient } from '@composedb/client'
+import { type ComposeClient } from '@composedb/client'
 
 const CHECK_SAFE_EXISTS_QUERY = (safeAddress: string) => `
 query GetSafe {
@@ -16,7 +16,7 @@ query GetSafe {
 // Using the query in a component
 export const checkSafeExists = async (safeAddress: string, composeClient: ComposeClient) => {
   const executionResult = await composeClient.executeQuery(CHECK_SAFE_EXISTS_QUERY(safeAddress))
-  if (executionResult && executionResult.data !== undefined && executionResult.data !== null) {
+  if (executionResult?.data !== undefined && executionResult.data !== null) {
     const safeIndex: any = executionResult.data.safeIndex
     if (safeIndex.edges.length !== 0) {
       console.log('safe exists')
