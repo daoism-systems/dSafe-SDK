@@ -1,42 +1,47 @@
-import { CeramicClient } from '@ceramicnetwork/http-client';
-import { ComposeClient } from "@composedb/client";
+import { CeramicClient } from '@ceramicnetwork/http-client'
+import { ComposeClient } from '@composedb/client'
 import { API_ENDPOINT, CERAMIC_NETWORKS } from '../config/constants.js'
 import Logger from '../utils/Logger.utils.js'
 import axios, { type AxiosResponse, type AxiosRequestConfig } from 'axios'
 import { throwError } from '../utils/error.utils.js'
 import { ERROR_CODE } from '../config/ERROR_CODES.js'
 import handleDSafeRequest from '../handlers/handler.js'
-import { CeramicNetwork } from '../types/SAFE_API_NETWORK.types.js';
-import {definition} from "../../__generated__/definitions.dev.js";
-import { RuntimeCompositeDefinition } from "@composedb/types";
-import { fromString } from 'uint8arrays';
-import { DID } from 'dids';
-import { getResolver } from 'key-did-resolver';
-import { Ed25519Provider } from 'key-did-provider-ed25519';
-import { DIDSession } from 'did-session'
-import { EthereumWebAuth, getAccountId } from '@didtools/pkh-ethereum'
+import { type CeramicNetwork } from '../types/SAFE_API_NETWORK.types.js'
+import { definition } from '../../__generated__/definitions.dev.js'
+import { type RuntimeCompositeDefinition } from '@composedb/types'
+import { fromString } from 'uint8arrays'
+import { DID } from 'dids'
+import { getResolver } from 'key-did-resolver'
+import { Ed25519Provider } from 'key-did-provider-ed25519'
 const log = new Logger()
 
 export default class DSafe {
   initialised: boolean = false
   network: string = ''
-  ceramicClient: CeramicClient;
+  ceramicClient: CeramicClient
   composeClient: ComposeClient
-  did: DID | undefined;
+  did: DID | undefined
 
-  constructor(network: string, ceramicNetwork: keyof CeramicNetwork, ceramicNetworkOverride?: string) {
-    const ceramicNodeUrlToUse = ceramicNetworkOverride === undefined ? CERAMIC_NETWORKS[ceramicNetwork] : ceramicNetworkOverride;
+  constructor(
+    network: string,
+    ceramicNetwork: keyof CeramicNetwork,
+    ceramicNetworkOverride?: string,
+  ) {
+    const ceramicNodeUrlToUse =
+      ceramicNetworkOverride === undefined
+        ? CERAMIC_NETWORKS[ceramicNetwork]
+        : ceramicNetworkOverride
     this.initialised = true
     this.network = network
-    this.ceramicClient = new CeramicClient(ceramicNodeUrlToUse);
+    this.ceramicClient = new CeramicClient(ceramicNodeUrlToUse)
     this.composeClient = new ComposeClient({
       ceramic: ceramicNodeUrlToUse,
       definition: definition as RuntimeCompositeDefinition,
-    });
-    log.info('DSafe SDK initialised. Chain ID and Ceramic Node URL', [network, ceramicNodeUrlToUse]);
+    })
+    log.info('DSafe SDK initialised. Chain ID and Ceramic Node URL', [network, ceramicNodeUrlToUse])
   }
 
-  async initializeDIDOnNode(privateKey: string) {
+  async initializeDIDOnNode(privateKey: string): Promise<void> {
     // generate DID
     if (privateKey === '') {
       console.log('Private key cannot be empty')
@@ -46,15 +51,13 @@ export default class DSafe {
     const did = new DID({
       resolver: getResolver(),
       provider: new Ed25519Provider(key),
-    });
-    await did.authenticate();
-    this.did = did;
-    this.composeClient.setDID(did);
+    })
+    await did.authenticate()
+    this.did = did
+    this.composeClient.setDID(did)
   }
 
-  initializeDIDOnClient() {
-
-  }
+  async initializeDIDOnClient(): Promise<void> {}
 
   /**
    * @function generateApiUrl Generate API url
@@ -88,11 +91,18 @@ export default class DSafe {
     payload?: unknown,
     network?: string,
   ): Promise<AxiosResponse> {
+    console.log('Fetching...')
     const apiUrl = this.generateApiUrl(apiRoute, network)
-    const status = await handleDSafeRequest(this.composeClient, httpMethod, apiRoute, payload, network)
-    if(status === false) {
-      log.error("DSafe request failed, execution stopped!", []);
-      throw Error("dSafe request failed");
+    const status = await handleDSafeRequest(
+      this.composeClient,
+      httpMethod,
+      apiRoute,
+      payload,
+      network,
+    )
+    if (!status) {
+      log.error('DSafe request failed, execution stopped!', [])
+      throw Error('dSafe request failed')
     }
     log.info('Fetch route:', [apiUrl])
     const options: AxiosRequestConfig = {}

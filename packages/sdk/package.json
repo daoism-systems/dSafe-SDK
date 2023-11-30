@@ -55,6 +55,7 @@
     "@composedb/devtools-node": "^0.5.2",
     "@composedb/types": "^0.5.1",
     "@didtools/pkh-ethereum": "^0.4.1",
+    "@safe-global/safe-deployments": "^1.28.0",
     "@types/graphql": "^14.5.0",
     "axios": "^1.6.0",
     "did-session": "^2.1.1",

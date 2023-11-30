@@ -1,12 +1,13 @@
 // import chai from 'chai'
 import dotenv from 'dotenv'
 import DSafe from '../src/index.js'
-import {describe, expect, test} from '@jest/globals';
+import { describe, expect } from '@jest/globals'
 import { API_ENDPOINT, STATUS_CODE_200, STATUS_CODE_400 } from '../src/config/constants.js'
 import { ERROR_CODE } from '../src/config/ERROR_CODES.js'
 import NETWORKS from '../src/config/networks.js'
 import Logger from '../src/utils/Logger.utils.js'
-import { ethers } from 'ethers'
+import { ethers, getBytes } from 'ethers'
+import { getSafeSingletonDeployment } from '@safe-global/safe-deployments'
 dotenv.config({ path: './.env' })
 const log = new Logger()
 // const expect = chai.expect
@@ -16,7 +17,7 @@ const PRIVATE_KEY = process.env.PRIVATE_KEY
 describe('DSafe: Forward API request to Safe API endpoint', () => {
   const chainId: string = NETWORKS.GOERLI
   let dsafe: DSafe
-  const ceramicNodeNetwork = 'local';
+  const ceramicNodeNetwork = 'local'
   const demoApiRouteWithoutSlash: string = 'sendTransactions'
   const demoApiRouteWithSlash: string = '/sendTransactions'
   const testAccountOnGoerli = '0x9cA70B93CaE5576645F5F069524A9B9c3aef5006'
@@ -46,30 +47,34 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
   ]
   const emptyApi: string = ''
   beforeEach(async () => {
-    log.info('>> Instantiate Dsafe instance', []);
-    dsafe = new DSafe(chainId, ceramicNodeNetwork);
-    await dsafe.initializeDIDOnNode(PRIVATE_KEY as string);
+    log.info('>> Instantiate Dsafe instance', [])
+    dsafe = new DSafe(chainId, ceramicNodeNetwork)
+    await dsafe.initializeDIDOnNode(PRIVATE_KEY as string)
   })
   it('DSafe instance is initialised with correct chain ID', () => {
-    expect(dsafe.ceramicClient).toBeDefined();
-    expect(dsafe.composeClient).toBeDefined();
+    expect(dsafe.ceramicClient).toBeDefined()
+    expect(dsafe.composeClient).toBeDefined()
     expect(dsafe.initialised).toBe(true)
   })
   it('Dsafe fails when private key is empty', async () => {
-    const newDsafe = new DSafe(chainId, ceramicNodeNetwork);
-    await expect(newDsafe.initializeDIDOnNode('')).rejects.toThrow("Private Key empty!");
+    const newDsafe = new DSafe(chainId, ceramicNodeNetwork)
+    await expect(newDsafe.initializeDIDOnNode('')).rejects.toThrow('Private Key empty!')
   })
   it('Dsafe safely generates DID on Node', async () => {
-    const newDsafe = new DSafe(chainId, ceramicNodeNetwork);
-    expect(newDsafe.did).toBeUndefined();
-    expect(newDsafe.composeClient.did).toBeUndefined();
-    await newDsafe.initializeDIDOnNode(PRIVATE_KEY as string);
-    expect(newDsafe.composeClient.did).toBeDefined();
-    expect(newDsafe.did).toBeDefined();
+    const newDsafe = new DSafe(chainId, ceramicNodeNetwork)
+    expect(newDsafe.did).toBeUndefined()
+    expect(newDsafe.composeClient.did).toBeUndefined()
+    await newDsafe.initializeDIDOnNode(PRIVATE_KEY as string)
+    expect(newDsafe.composeClient.did).toBeDefined()
+    expect(newDsafe.did).toBeDefined()
   })
   it('Should generate correct API URL', () => {
-    expect(dsafe.generateApiUrl(demoApiRouteWithoutSlash)).toBe(`${API_ENDPOINT(chainId)}/${demoApiRouteWithoutSlash}`)
-    expect(dsafe.generateApiUrl(demoApiRouteWithSlash)).toBe(`${API_ENDPOINT(chainId)}${demoApiRouteWithSlash}`)
+    expect(dsafe.generateApiUrl(demoApiRouteWithoutSlash)).toBe(
+      `${API_ENDPOINT(chainId)}/${demoApiRouteWithoutSlash}`,
+    )
+    expect(dsafe.generateApiUrl(demoApiRouteWithSlash)).toBe(
+      `${API_ENDPOINT(chainId)}${demoApiRouteWithSlash}`,
+    )
   })
   it('Should throw error if api route is empty string', () => {
     const wrappedFunction = (): string => dsafe.generateApiUrl(emptyApi)
@@ -78,13 +83,13 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
   it('Should get about the API', async () => {
     const result = await dsafe.fetchLegacy('GET', 'v1/about')
     expect(result.status).toBe(STATUS_CODE_200)
-  }, 5000)
+  }, 10000)
   it('should fetch all the safes of an owner', async () => {
     const apiRoute = `/v1/owners/${testAccountOnGoerli}/safes`
     const result = await dsafe.fetchLegacy('GET', apiRoute)
     log.info('Data returned from API:', [result.data])
     expect(result.status).toBe(STATUS_CODE_200)
-  }, 5000)
+  }, 10000)
   it('should post a new delegate to the safe', async () => {
     // add delegate
     const apiRoute = 'v1/delegates/' // add trailing forward slash to prevent server from doing GET
@@ -129,12 +134,58 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
     expect(result.data?.parameters[0].value).toBe(testAccountOnGoerli)
   })
   it('should be able to create new transaction', async () => {
-    const createTransactionRoute = 'v1/create-transaction/';
-    const safeAddress = "0xa192aBe4667FC4d11e46385902309cd7421997ed";
+    const safeAddress = '0xa192aBe4667FC4d11e46385902309cd7421997ed'
+    const createTransactionRoute = `v1/safes/${safeAddress}/multisig-transactions/`
+
+    const safeAbi = getSafeSingletonDeployment()?.abi
+    if (safeAbi === undefined) {
+      throw Error('Safe ABI is undefined')
+    }
+    const trxInput = {
+      to: testUsdt,
+      value: 1,
+      data: '0x',
+      operation: '0',
+      safeTxGas: 0,
+      baseGas: 0,
+      gasPrice: 0,
+      gasToken: '0x0000000000000000000000000000000000000000',
+      refundReceiver: '0x0000000000000000000000000000000000000000',
+      nonce: 13,
+    }
+    const provider = ethers.getDefaultProvider(chainId)
+    const signer = new ethers.BaseWallet(new ethers.SigningKey(PRIVATE_KEY as string), provider)
+    const safeInstance = new ethers.Contract(safeAddress, safeAbi, signer)
+    const safeTrxHash = await safeInstance.getTransactionHash(
+      trxInput.to,
+      trxInput.value,
+      trxInput.data,
+      trxInput.operation,
+      trxInput.safeTxGas,
+      trxInput.baseGas,
+      trxInput.gasPrice,
+      trxInput.gasToken,
+      trxInput.refundReceiver,
+      trxInput.nonce,
+    )
+    const signature = (await signer.signMessage(getBytes(safeTrxHash)))
+      .replace(/1b$/, '1f')
+      .replace(/1c$/, '20')
+    // todo: add correct payload
     const payload = {
-      safeAddress: safeAddress,
+      safe: safeAddress,
       sender: testAccountOnGoerli,
-    };
-    const result = await dsafe.fetchLegacy("POST", createTransactionRoute, payload, chainId);
-  })
+      contractTransactionHash: safeTrxHash,
+      to: trxInput.to,
+      data: trxInput.data,
+      baseGas: trxInput.baseGas,
+      gasPrice: trxInput.gasPrice,
+      safeTxGas: trxInput.safeTxGas,
+      value: trxInput.value,
+      operation: trxInput.operation,
+      nonce: trxInput.nonce,
+      signature,
+    }
+    const result = await dsafe.fetchLegacy('POST', createTransactionRoute, payload, chainId)
+  }, 100000)
 })

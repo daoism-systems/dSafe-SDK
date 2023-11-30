@@ -5,7 +5,7 @@ export interface SAFE_API_NETWORK {
 }
 
 export interface CeramicNetwork {
-  local: string;
-  testnet: string;
-  mainnet: string;
+  local: string
+  testnet: string
+  mainnet: string
 }

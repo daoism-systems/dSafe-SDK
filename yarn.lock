@@ -1430,6 +1430,7 @@ __metadata:
     "@didtools/pkh-ethereum": ^0.4.1
     "@istanbuljs/nyc-config-typescript": ^1.0.2
     "@jest/globals": ^29.7.0
+    "@safe-global/safe-deployments": ^1.28.0
     "@types/chai": ^4.3.9
     "@types/graphql": ^14.5.0
     "@types/jest": ^29.5.10
@@ -2675,6 +2676,15 @@ __metadata:
   version: 3.0.5
   resolution: "@repeaterjs/repeater@npm:3.0.5"
   checksum: 4f66020679a2e7a93fbd43d40a7ae6a187d6d7d148b019cca025791dade452599848bd20cd225861a65629571806c551a18cd40190426eb74b050710ac3ae865
+  languageName: node
+  linkType: hard
+
+"@safe-global/safe-deployments@npm:^1.28.0":
+  version: 1.28.0
+  resolution: "@safe-global/safe-deployments@npm:1.28.0"
+  dependencies:
+    semver: ^7.3.7
+  checksum: d026839d625eaac52877b683514f329e1e38afff502c43545d3affb21b6dac9414665510b27d95f2894c1c4e962e3a4e8f035e9b7078de95724633351a85b350
   languageName: node
   linkType: hard
 
@@ -9110,7 +9120,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"semver@npm:^7.0.0, semver@npm:^7.3.5, semver@npm:^7.5.3, semver@npm:^7.5.4":
+"semver@npm:^7.0.0, semver@npm:^7.3.5, semver@npm:^7.3.7, semver@npm:^7.5.3, semver@npm:^7.5.4":
   version: 7.5.4
   resolution: "semver@npm:7.5.4"
   dependencies:
