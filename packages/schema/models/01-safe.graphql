@@ -7,7 +7,7 @@ type Safe
   safeAddress: String! @string(maxLength: 42  minLength: 42) # bytea in SQL
   network: ChainID! # varchar(50) in SQL
   totalTransactions: Int! # int in SQL
-  singleton: String! @string(maxLength: 66  minLength: 66) # bytea in SQL
+  singleton: String! @string(maxLength: 42  minLength: 42) # bytea in SQL
   deployedBlockNumber: Int! # int in SQL
   nonce: Int! # int in SQL
   fallbackHandler: String! @string(maxLength: 42  minLength: 42)
