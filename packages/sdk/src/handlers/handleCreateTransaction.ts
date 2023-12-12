@@ -153,42 +153,5 @@ export default async function handleCreateTransaction(
       // and remove all other confirmations because the transaction has been updated
       // const confirmationExists = await checkConfirmationExists()
     }
-    // // check if sender is valid signer
-    // const isSenderValidSigner = checkIfSignerIsValidSigner();
-    // const signerExist = checkSignerExist();
-    // const signerSafeRelationExist = checkSignerSafeRelationship();
-    // const delegateExist = checkDelegateExist();
-    // if(!isSenderValidSigner && signerExist && signerSafeRelationExist) {
-    //   // signer isn't a signer anymore
-    //   removeSafeSignerRelationship();
-    //   log.info("Sender isn't a valid signer anymore. Removing Signer's relationship with Safe", []);
-    // }
-    // if(isSenderValidSigner) {
-    //   if(!signerExist) {
-    //     composeSigner();
-    //   }
-    //   if(!signerSafeRelationExist) {
-    //     // new signer to the safe
-    //     composeSafeSignerRelation();
-    //   }
-    //     return false;
-    // } else if(!delegateExist) {
-    // // if noeither signer nor delegate -> revert
-    //   throw Error("Sender is neither signer nor delegate!");
-    // } else {
-    //   // delegate flow
-    // }
-  
-    // // check if signature is valid
-    // const isSignatureValid = validateSignature();
-    // // check if transaction exists, if not, create transaction
-    // const transactionExists = await checkTransactionExists();
-    // if(!transactionExists) {
-    //   composeTransaction();
-    // }
-    //    else, add confirmation to transaction
-    // add a confirmation if the transaction is created by a signer
-    // if not signer, check if sender is a delegate
-    // do not add confirmations
     return true
   }
