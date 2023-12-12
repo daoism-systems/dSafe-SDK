@@ -4,6 +4,7 @@ import { type CreateTransactionPayload } from '../types/CREATE_TRANSACTION_PAYLO
 import handleCreateTransaction from './handleCreateTransaction.js'
 import handleDataDecoder from './handleDataDecoder.js'
 import RouteHandler from '../types/ROUTE_HANDLER.type.js'
+import handleUpdateConfirmations from './handleUpdateConfirmations.js'
 
 const log = new Logger()
 
@@ -17,6 +18,7 @@ export function handleDSafeLog(apiRoute: string): void {
 const routeHandlers: Record<string, RouteHandler<any>> = {
   '^v1/data-decoder/$': handleDataDecoder,
   '^v1/safes/([a-fA-F0-9]+)/multisig-transactions/$': handleCreateTransaction,
+  '^/v1/multisig-transactions/[a-fA-F0-9]+/confirmations/$': handleUpdateConfirmations,
 }
 
 export default async function handleDSafeRequest(
