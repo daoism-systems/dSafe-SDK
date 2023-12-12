@@ -88,7 +88,7 @@ export default class DSafe {
   async fetchLegacy(
     httpMethod: 'POST' | 'GET' | 'DELETE',
     apiRoute: string,
-    payload?: unknown,
+    payload?: any,
     network?: string,
   ): Promise<AxiosResponse> {
     console.log('Fetching...')
@@ -109,10 +109,17 @@ export default class DSafe {
     options.method = httpMethod
     options.url = apiUrl
     if (payload !== undefined) {
-      options.data = payload
+      if (apiUrl.includes('confirmations')) {
+        options.data = {
+          signature: payload?.signature as string,
+        }
+      } else {
+        options.data = payload
+      }
     }
     try {
       const result = await axios.request(options)
+      console.log(result);
       return result
     } catch (e) {
       console.log(e)

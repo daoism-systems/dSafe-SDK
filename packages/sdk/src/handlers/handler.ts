@@ -17,8 +17,8 @@ export function handleDSafeLog(apiRoute: string): void {
 // keep adding new handlers here to handle more API routes
 const routeHandlers: Record<string, RouteHandler<any>> = {
   '^v1/data-decoder/$': handleDataDecoder,
-  '^v1/safes/([a-fA-F0-9]+)/multisig-transactions/$': handleCreateTransaction,
-  '^/v1/multisig-transactions/[a-fA-F0-9]+/confirmations/$': handleUpdateConfirmations,
+  '^v1/safes/([a-zA-Z0-9]+)/multisig-transactions/$': handleCreateTransaction,
+  '^/v1/multisig-transactions/[a-zA-Z0-9]+/confirmations/$': handleUpdateConfirmations,
 }
 
 export default async function handleDSafeRequest(
@@ -37,5 +37,5 @@ export default async function handleDSafeRequest(
     }
   }
   console.log(`No handler found for route: ${apiRoute}`)
-  return false
+  return true
 }

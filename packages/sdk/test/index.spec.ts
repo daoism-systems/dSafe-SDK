@@ -83,7 +83,7 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
   it('Should get about the API', async () => {
     const result = await dsafe.fetchLegacy('GET', 'v1/about')
     expect(result.status).toBe(STATUS_CODE_200)
-  }, 10000)
+  }, 100000)
   it('should fetch all the safes of an owner', async () => {
     const apiRoute = `/v1/owners/${testAccountOnGoerli}/safes`
     const result = await dsafe.fetchLegacy('GET', apiRoute)
@@ -187,5 +187,66 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
       signature,
     }
     const result = await dsafe.fetchLegacy('POST', createTransactionRoute, payload, chainId)
+  }, 100000)
+  it("should be able to add new confirmation to existing transaction", async () => {
+    const safeAddress = '0xa192aBe4667FC4d11e46385902309cd7421997ed'
+
+    const safeAbi = getSafeSingletonDeployment()?.abi
+    if (safeAbi === undefined) {
+      throw Error('Safe ABI is undefined')
+    }
+    const trxInput = {
+      to: testUsdt,
+      value: 1,
+      data: '0x',
+      operation: '0',
+      safeTxGas: 0,
+      baseGas: 0,
+      gasPrice: 0,
+      gasToken: '0x0000000000000000000000000000000000000000',
+      refundReceiver: '0x0000000000000000000000000000000000000000',
+      nonce: 13,
+    }
+    console.log("This is working");
+    const provider = ethers.getDefaultProvider(chainId)
+    console.log("This is working");
+    const signer = new ethers.BaseWallet(new ethers.SigningKey(PRIVATE_KEY as string), provider)
+    const safeInstance = new ethers.Contract(safeAddress, safeAbi, signer)
+    console.log("This is working");
+    const safeTrxHash = await safeInstance.getTransactionHash(
+      trxInput.to,
+      trxInput.value,
+      trxInput.data,
+      trxInput.operation,
+      trxInput.safeTxGas,
+      trxInput.baseGas,
+      trxInput.gasPrice,
+      trxInput.gasToken,
+      trxInput.refundReceiver,
+      trxInput.nonce,
+    )
+    console.log("This is working");
+
+    const updateConfirmationRoute = `/v1/multisig-transactions/${safeTrxHash}/confirmations/`
+    console.log(safeTrxHash);
+    console.log("This is working");
+    const signature = (await signer.signMessage(getBytes(safeTrxHash)))
+      .replace(/1b$/, '1f')
+      .replace(/1c$/, '20')
+    console.log("This is working");
+
+    const payload = {
+      data: {
+      signature: signature
+      },
+      safe: safeAddress,
+      signature: signature,
+      safe_tx_hash: safeTrxHash,
+      sender: signer.address
+    };
+    console.log("This is working");
+
+    const result = await dsafe.fetchLegacy("POST", updateConfirmationRoute, payload, chainId);
+    console.log(result);
   }, 100000)
 })

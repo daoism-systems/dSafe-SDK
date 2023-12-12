@@ -20,7 +20,7 @@ const CHECK_TRANSACTION_EXIST_WITH_SAFE_TX_HASH = (safeTxHash: string) => `
 query CheckTransactionExist {
     transactionIndex(
         first: 1
-        filters: {where: {safeTransactionHash: {equalTo: ${safeTxHash}}}}
+        filters: {where: {safeTransactionHash: {equalTo: "${safeTxHash}"}}}
       ) {
         edges {
           node {
@@ -40,6 +40,7 @@ export const checkTransactionBasedOnSafeTxHash = async (
   const executionResult = await composeClient.executeQuery(
     CHECK_TRANSACTION_EXIST_WITH_SAFE_TX_HASH(safeTxHash),
   )
+  console.log("Execution result", executionResult);
   if (executionResult?.data !== undefined && executionResult.data !== null) {
     const transactionIndex: any = executionResult.data.transactionIndex
     if (transactionIndex.edges.length !== 0) {

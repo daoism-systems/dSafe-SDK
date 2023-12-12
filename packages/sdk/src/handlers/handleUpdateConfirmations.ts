@@ -14,16 +14,24 @@ const handleUpdateConfirmations: RouteHandler<UPDATE_CONFIRMATION_PAYLOAD> = asy
   payload?: UPDATE_CONFIRMATION_PAYLOAD,
   network?: string,
 ) => {
+  console.log("Payload.Safe_tx_hash", payload?.safe_tx_hash);
   // fetch safe_tx_hash
   const transactionExists = await checkTransactionBasedOnSafeTxHash(
     payload?.safe_tx_hash as string,
     composeClient,
   )
+  console.log(transactionExists);
   if (!transactionExists.exists) {
     throw Error("Transaction doesn't exist")
   }
   // todo: use transaction stream ID to fetch safe instead of taking it from user
-  const response = await axios.get(`${API_ENDPOINT(network as string)}/v1/safes/${payload?.safe}`)
+  let response: any;
+  try {
+    response = await axios.get(`${API_ENDPOINT(network as string)}/v1/safes/${payload?.safe}`)
+  } catch (e) {
+    console.log(e);
+  }
+  console.log(response);
   const data = response.data
   // add confirmation to the transaction
   const signerExist = await checkSignerExists(payload?.sender as string, composeClient)
