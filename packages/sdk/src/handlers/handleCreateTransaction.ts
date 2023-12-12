@@ -4,7 +4,7 @@ import { checkSafeExists } from '../composedb/queries/querySafe.js'
 import { checkSignerExists } from '../composedb/queries/querySigner.js'
 import { composeSafe } from '../composedb/mutations/mutateSafe.js'
 import axios from 'axios'
-import { API_ENDPOINT } from '../config/constants.js'
+import { API_ENDPOINT, EMPTY_TRANSACTION_DATA, ZERO_ADDRESS_GAS_TOKEN, ZERO_ADDRESS_REFUND_RECEIVER } from '../config/constants.js'
 import { composeSigner } from '../composedb/mutations/mutateSigner.js'
 import { composeTransaction } from '../composedb/mutations/mutateTransaction.js'
 import { checkTransactionExists } from '../composedb/queries/queryTransaction.js'
@@ -32,16 +32,28 @@ export default async function handleCreateTransaction(
     // get safe data from API Service
     const response = await axios.get(`${API_ENDPOINT(network)}/v1/safes/${payload.safe}`)
     // todo: add checks when response fails
+    // validateResponse(response);
     // todo: add checks: safeTxHash is valid
-    // todo: add checks: signature is valid
+    // validateSafeTxHash(payload.safeTxHash);
     // todo: add checks: whether sender is signer or not (and then whether sender is delegate)
+    // todo: add checks: signature is valid
+    // const isDelegate: bool = validateSignatureBySignerOrDelegate(payload.signature, payload.sender);
+    // todo: add function to fetch current native balance
+    // const nativeTokenBalance = fetchTokenBalance(payload.safe);
+    const nativeTokenBalance = '0';
+    // todo: add function to fetch the block number when the contract was deployed
+    // const deployedBlockNumber = fetchDeployedBlockNumber(payload.safe);
+    const deployedBlockNumber = 10;
+
+    // todo: find caip network ID for network string
+    const networkId = 'eip155:1';
   
     const data = response.data
     if (!safeExist.exists) {
       console.log('Composing Safe')
       const input = {
         content: {
-          network: 'eip155:1',
+          network: networkId,
           singleton: data.masterCopy,
           threshold: data.threshold,
           nonce: data.nonce, // currently this nonce represent the total transaction executed on-chain
@@ -50,8 +62,8 @@ export default async function handleCreateTransaction(
           guard: data.guard,
           version: data.version,
           totalTransactions: data.nonce, // currently assuming users do not skip any nonce value
-          nativeTokenBalance: '0', // todo: add function to fetch current native balance
-          deployedBlockNumber: 10, // todo: add function to fetch the block number when the contract was deployed
+          nativeTokenBalance: nativeTokenBalance, 
+          deployedBlockNumber: deployedBlockNumber,
         },
       }
       console.log('Creating new safe on ComposeDB...')
@@ -90,19 +102,19 @@ export default async function handleCreateTransaction(
         value: payload.value,
         refundReceiver:
           payload.refundReceiver === undefined
-            ? '0x0000000000000000000000000000000000000000'
+            ? ZERO_ADDRESS_REFUND_RECEIVER
             : payload.refundReceiver,
-        data: payload.data === undefined ? '0x' : payload.data,
+        data: payload.data === undefined ? EMPTY_TRANSACTION_DATA : payload.data,
         operation: payload.operation,
         gasToken:
           payload.gasToken === undefined
-            ? '0x0000000000000000000000000000000000000000'
+            ? ZERO_ADDRESS_GAS_TOKEN
             : payload.gasToken,
         nonce: payload.nonce,
         sender: payload.sender,
         signature: payload.signature,
         safeID: safeStreamId,
-        network: 'eip155:1',
+        network: networkId,
       },
     }
     const transactionExists = await checkTransactionExists(
