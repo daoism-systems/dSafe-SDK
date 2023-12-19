@@ -119,7 +119,7 @@ export default class DSafe {
     }
     try {
       const result = await axios.request(options)
-      console.log(result);
+      console.log(result)
       return result
     } catch (e) {
       console.log(e)
