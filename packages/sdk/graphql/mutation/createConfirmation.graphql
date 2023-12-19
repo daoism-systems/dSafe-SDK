@@ -1,0 +1,9 @@
+mutation CreateConfirmation($input: CreateConfirmationInput!) {
+  createConfirmation(input: $input) {
+    document {
+      signerID
+      transactionId
+      signature
+    }
+  }
+}

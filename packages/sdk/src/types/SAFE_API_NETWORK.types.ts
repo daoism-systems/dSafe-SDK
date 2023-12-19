@@ -3,3 +3,9 @@ export interface SAFE_API_NETWORK {
   goerli: string
   optimism: string
 }
+
+export interface CeramicNetwork {
+  local: string
+  testnet: string
+  mainnet: string
+}

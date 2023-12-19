@@ -1,0 +1,7 @@
+mutation CreateSigner($input: CreateSignerInput!) {
+  createSigner(input: $input) {
+    document {
+      signer
+    }
+  }
+}

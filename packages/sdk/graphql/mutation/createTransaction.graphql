@@ -1,0 +1,23 @@
+mutation CreateTransaction($input: CreateTransactionInput!) {
+  createTransaction(input: $input) {
+    document {
+      safeTransactionHash
+      executor
+      to
+      gas
+      gasPrice
+      baseGasPrice
+      refundReceiver
+      trxHash
+      data
+      operation
+      gasToken
+      nonce
+      sender
+      signature
+      origin
+      safeID
+      network
+    }
+  }
+}
