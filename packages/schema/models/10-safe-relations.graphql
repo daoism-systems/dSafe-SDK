@@ -16,7 +16,7 @@ type Transaction @loadModel(id: "$TRANSACTION_ID") {
 
 type Safe @loadModel(id: "$SAFE_ID") {
   tokens: [Token] @string(maxLength: 42  minLength: 42) @relationFrom(model: "Token", property: "safeId")
-  signers: [SignerSafeRelationship] @list(maxLength: 50) @string(maxLength: 42  minLength: 42) @relationFrom(model: "SignerSafeRelationship", property: "safeId")
-  delegates: [Delegate] @list(maxLength: 50) @string(maxLength: 42  minLength: 42) @relationFrom(model: "Delegate", property: "safeId")
+  signers: [SignerSafeRelationship] @list(maxLength: 50) @string(maxLength: 42  minLength: 42) @relationFrom(model: "SignerSafeRelationship", property: "safeID")
+  delegates: [Delegate] @list(maxLength: 50) @string(maxLength: 42  minLength: 42) @relationFrom(model: "Delegate", property: "safeID")
   transactions: [Transaction] @string(maxLength: 66  minLength: 66) @relationFrom(model: "Transaction", property: "safeID")
 }
