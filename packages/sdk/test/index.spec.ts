@@ -9,6 +9,7 @@ import Logger from '../src/utils/Logger.utils.js'
 import { ethers, getBytes } from 'ethers'
 import { getSafeSingletonDeployment } from '@safe-global/safe-deployments'
 import { GetSafePayload } from '../src/types/GET_SAFE_PAYLOAD.type.js'
+import { GetAllTransactionsPayload } from '../src/types/GET_ALL_TRANSACTIONS.js'
 dotenv.config({ path: './.env' })
 const log = new Logger()
 // const expect = chai.expect
@@ -127,7 +128,7 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
     expect(delegates.data.results[delegateExist].delegate).toBe(delegateAddress)
   }, 100000)
   it('should use dSafe registry for Data decoder', async () => {
-    const decodeDataroute = 'v1/data-decoder/'
+    const decodeDataroute = '/v1/data-decoder/'
     const usdt = new ethers.Contract(testUsdt, totalSupplyAbi)
     const encodedData = usdt.interface.encodeFunctionData('balanceOf', [testAccountOnGoerli])
     const payload = {
@@ -140,7 +141,7 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
   })
   it('should be able to create new transaction', async () => {
     const safeAddress = '0xa192aBe4667FC4d11e46385902309cd7421997ed'
-    const createTransactionRoute = `v1/safes/${safeAddress}/multisig-transactions/`
+    const createTransactionRoute = `/v1/safes/${safeAddress}/multisig-transactions/`
 
     const safeAbi = getSafeSingletonDeployment()?.abi
     if (safeAbi === undefined) {
@@ -275,5 +276,13 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
       address: safeAddress,
     }
     const data = await dsafe.fetchLegacy('GET', getSafeRoute, payload, chainId)
+  })
+  it('get all transactions', async () => {
+    const safeAddress = '0xa192aBe4667FC4d11e46385902309cd7421997ed'
+    const getTransactionsRoute = `/v1/safes/${safeAddress}/multisig-transactions/`
+    const payload: GetAllTransactionsPayload = {
+      address: safeAddress,
+    }
+    const data = await dsafe.fetchLegacy('GET', getTransactionsRoute, payload, chainId)
   })
 })
