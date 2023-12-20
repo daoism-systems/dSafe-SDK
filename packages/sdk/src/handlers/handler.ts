@@ -5,6 +5,7 @@ import handleCreateTransaction from './handleCreateTransaction.js'
 import handleDataDecoder from './handleDataDecoder.js'
 import RouteHandler from '../types/ROUTE_HANDLER.type.js'
 import handleUpdateConfirmations from './handleUpdateConfirmations.js'
+import handleGetSafe from './handleGetSafe.js'
 
 const log = new Logger()
 
@@ -17,8 +18,9 @@ export function handleDSafeLog(apiRoute: string): void {
 // keep adding new handlers here to handle more API routes
 const routeHandlers: Record<string, RouteHandler<any>> = {
   '^v1/data-decoder/$': handleDataDecoder,
-  '^v1/safes/([a-zA-Z0-9]+)/multisig-transactions/$': handleCreateTransaction,
-  '^/v1/multisig-transactions/[a-zA-Z0-9]+/confirmations/$': handleUpdateConfirmations,
+  '^v1/safes/0x[a-fA-F0-9]+/multisig-transactions/$': handleCreateTransaction,
+  '^/v1/multisig-transactions/0x[a-fA-F0-9]+/confirmations/$': handleUpdateConfirmations,
+  '^/v1/safes/0x[a-fA-F0-9]+/$': handleGetSafe,
 }
 
 export default async function handleDSafeRequest(

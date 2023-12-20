@@ -16,6 +16,8 @@ import { checkTransactionExists } from '../composedb/queries/queryTransaction.js
 import { composeConfirmation } from '../composedb/mutations/mutateConfirmation.js'
 import { checkConfirmationExists } from '../composedb/queries/queryConfirmation.js'
 import RouteHandler from '../types/ROUTE_HANDLER.type.js'
+import { composeSignerSafe } from '../composedb/mutations/mutateSignerSafe.js'
+import { checkSignerSafeExists } from '../composedb/queries/querySignerSafe.js'
 
 const handleCreateTransaction: RouteHandler<CreateTransactionPayload> = async (
   composeClient: ComposeClient,
@@ -81,6 +83,7 @@ const handleCreateTransaction: RouteHandler<CreateTransactionPayload> = async (
   // for now, only focus on signer sending transaction
   const signerExist = await checkSignerExists(payload.sender, composeClient)
   let signerStreamId: string | undefined = signerExist.id
+  let signerSafeStreamId: string | undefined
   if (!signerExist.exists && data.owners.includes(payload.sender)) {
     console.log("Sender is signer but isn't Signer entity isn't created for the sender")
     const input = {
@@ -92,6 +95,25 @@ const handleCreateTransaction: RouteHandler<CreateTransactionPayload> = async (
     const signerCreated = await checkSignerExists(payload.sender, composeClient)
     console.log(`Signer Created: ${signerCreated.exists}`)
     signerStreamId = signerCreated.id
+    // create signer safe relationship
+    console.log('Signer created, now create Signer Safe relationship')
+    const signerSafeInput = {
+      content: {
+        signerID: signerStreamId,
+        safeID: safeStreamId,
+        network: networkId,
+        blockWhenAdded: deployedBlockNumber,
+      },
+    }
+    await composeSignerSafe(signerSafeInput, composeClient)
+    const signerSafeRelationshipCreated = await checkSignerSafeExists(
+      signerStreamId as string,
+      safeStreamId as string,
+      networkId,
+      composeClient,
+    )
+    console.log(`Signer Safe relationship: ${signerSafeRelationshipCreated.exists}`)
+    signerSafeStreamId = signerSafeRelationshipCreated.id
   }
 
   console.log(safeStreamId, signerStreamId)

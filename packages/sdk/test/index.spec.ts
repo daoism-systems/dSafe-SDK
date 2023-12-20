@@ -113,7 +113,7 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
           delegator: testAccountOnGoerli,
           signature,
           label: 'delegator',
-        }
+        },
       }
       const postResult = await dsafe.fetchLegacy('POST', apiRoute, payload)
       expect(postResult.status).not.toBe(STATUS_CODE_400)
@@ -132,8 +132,8 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
     const encodedData = usdt.interface.encodeFunctionData('balanceOf', [testAccountOnGoerli])
     const payload = {
       apiData: {
-        data: encodedData
-      }
+        data: encodedData,
+      },
     }
     const result = await dsafe.fetchLegacy('POST', decodeDataroute, payload)
     expect(result.data?.parameters[0].value).toBe(testAccountOnGoerli)
@@ -202,8 +202,8 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
         value: trxInput.value,
         operation: trxInput.operation,
         nonce: trxInput.nonce,
-        signature
-      }
+        signature,
+      },
     }
     const result = await dsafe.fetchLegacy('POST', createTransactionRoute, payload, chainId)
   }, 100000)
@@ -268,12 +268,12 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
     const result = await dsafe.fetchLegacy('POST', updateConfirmationRoute, payload, chainId)
     console.log(result)
   }, 100000)
-  it("get safe data", async () => {
+  it('get safe data', async () => {
     const safeAddress = '0xa192aBe4667FC4d11e46385902309cd7421997ed'
-    const getSafeRoute = `/v1/safes/${safeAddress}/`;
+    const getSafeRoute = `/v1/safes/${safeAddress}/`
     const payload: GetSafePayload = {
-      address: safeAddress
-    };
-    const data = await dsafe.fetchLegacy('GET', getSafeRoute, payload, chainId);
+      address: safeAddress,
+    }
+    const data = await dsafe.fetchLegacy('GET', getSafeRoute, payload, chainId)
   })
 })

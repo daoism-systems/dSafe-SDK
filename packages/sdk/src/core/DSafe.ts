@@ -108,18 +108,11 @@ export default class DSafe {
     const options: AxiosRequestConfig = {}
     options.method = httpMethod
     options.url = apiUrl
-    if (payload !== undefined) {
-      if (apiUrl.includes('confirmations')) {
-        options.data = {
-          signature: payload?.signature as string,
-        }
-      } else {
-        options.data = payload
-      }
+    if (payload?.apiData !== undefined) {
+      options.data = payload.apiData
     }
     try {
       const result = await axios.request(options)
-      console.log(result)
       return result
     } catch (e) {
       console.log(e)
