@@ -30,6 +30,15 @@ query GetSafe {
           version
           nativeTokenBalance
           threshold
+          signers(first: 40) {
+            edges {
+              node {
+                signer {
+                  signer
+                }
+              }
+            }
+          }
         }
     }
   }
@@ -59,7 +68,18 @@ export const getSafe = async (safeAddress: string, composeClient: ComposeClient)
     const safeIndex: any = executionResult.data.safeIndex
     if (safeIndex.edges.length !== 0) {
       console.log('safe exists')
-      const returnData = { exists: true, safeData: safeIndex.edges[0].node }
+      const safeData = {
+        address: safeIndex.edges[0].node.safeAddress,
+        nonce: safeIndex.edges[0].node.nonce,
+        threshold: safeIndex.edges[0].node.threshold,
+        owners: safeIndex.edges[0].node.signers.edges.map((item: any) => item.node.signer.signer),
+        masterCopy: safeIndex.edges[0].node.singleton,
+        modules: [],
+        fallbackHandler: safeIndex.edges[0].node.fallbackHandler,
+        guard: safeIndex.edges[0].node.guard,
+        version: safeIndex.edges[0].node.version,
+      }
+      const returnData = { exists: true, safeData: safeData }
       return returnData
     } else {
       return { exists: false, safeData: undefined }
