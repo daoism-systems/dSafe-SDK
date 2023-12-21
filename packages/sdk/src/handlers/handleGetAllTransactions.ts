@@ -7,6 +7,8 @@ import { checkSafeExists } from '../composedb/queries/querySafe.js'
 import { getAllTransactions } from '../composedb/queries/queryTransaction.js'
 import { GetAllTransactionsPayload } from '../types/GET_ALL_TRANSACTIONS.js'
 
+const networkId = 'eip155:1'
+
 const handleGetAllTransactions: RouteHandler<GetAllTransactionsPayload> = async (
   composeClient: ComposeClient,
   payload?: GetAllTransactionsPayload,
@@ -23,7 +25,7 @@ const handleGetAllTransactions: RouteHandler<GetAllTransactionsPayload> = async 
   }
   const safeId = safeExists.id
   // get transactions where safe ID
-  const transactionExists = await getAllTransactions(safeId, network as string, composeClient)
+  const transactionExists = await getAllTransactions(safeId, networkId as string, composeClient)
   console.log(transactionExists.transactionData)
   return transactionExists.exists
 }

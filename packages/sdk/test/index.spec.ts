@@ -10,6 +10,7 @@ import { ethers, getBytes } from 'ethers'
 import { getSafeSingletonDeployment } from '@safe-global/safe-deployments'
 import { GetSafePayload } from '../src/types/GET_SAFE_PAYLOAD.type.js'
 import { GetAllTransactionsPayload } from '../src/types/GET_ALL_TRANSACTIONS.js'
+import { GetTransactionPayload } from '../src/types/GET_TRANSACTION_PAYLOAD.type.js'
 dotenv.config({ path: './.env' })
 const log = new Logger()
 // const expect = chai.expect
@@ -284,5 +285,13 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
       address: safeAddress,
     }
     const data = await dsafe.fetchLegacy('GET', getTransactionsRoute, payload, chainId)
+  })
+  it('Get a transaction using safeTxHash', async () => {
+    const safeTxHash = '0x8cac27eca93ebddc0bb7edb62af9c5adfa7915ccca2ffe25adfe76e31a7835de'
+    const getTransactionRoute = `/v1/multisig-transactions/${safeTxHash}/`
+    const payload: GetTransactionPayload = {
+      safeTxHash: safeTxHash,
+    }
+    const data = await dsafe.fetchLegacy('GET', getTransactionRoute, payload, chainId)
   })
 })
