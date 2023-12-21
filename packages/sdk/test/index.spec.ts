@@ -11,6 +11,7 @@ import { getSafeSingletonDeployment } from '@safe-global/safe-deployments'
 import { GetSafePayload } from '../src/types/GET_SAFE_PAYLOAD.type.js'
 import { GetAllTransactionsPayload } from '../src/types/GET_ALL_TRANSACTIONS.js'
 import { GetTransactionPayload } from '../src/types/GET_TRANSACTION_PAYLOAD.type.js'
+import { GetTransactionConfirmationsPayload } from '../src/types/GET_TRANSACTION_CONFIRMATIONS_PAYLOAD.type.js'
 dotenv.config({ path: './.env' })
 const log = new Logger()
 // const expect = chai.expect
@@ -293,5 +294,13 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
       safeTxHash: safeTxHash,
     }
     const data = await dsafe.fetchLegacy('GET', getTransactionRoute, payload, chainId)
+  })
+  it('Get confirmations for a safeTrxHash', async () => {
+    const safeTxHash = '0x8cac27eca93ebddc0bb7edb62af9c5adfa7915ccca2ffe25adfe76e31a7835de'
+    const getConfirmationRoute = `/v1/multisig-transactions/${safeTxHash}/confirmations/`
+    const payload: GetTransactionConfirmationsPayload = {
+      safeTxHash: safeTxHash,
+    }
+    const data = await dsafe.fetchLegacy('GET', getConfirmationRoute, payload, chainId)
   })
 })

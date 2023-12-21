@@ -16,6 +16,32 @@ query CheckConfirmationExist {
 }
 `
 
+const GET_CONFIRMATIONS = (safeTxHash: string, networkId: string) => `
+query GetConfirmations {
+transactionIndex(
+  first: 1
+  filters: {where: {network: {equalTo: "${networkId}"}, safeTransactionHash: {equalTo: "${safeTxHash}"}}}
+) {
+  edges {
+    node {
+      id
+      safeTransactionHash
+      confirmations(first: 10) {
+        edges {
+          node {
+            signature
+            signer {
+              signer
+            }
+          }
+        }
+      }
+    }
+  }
+}
+}
+`
+
 // Using the query in a component
 export const checkConfirmationExists = async (
   signerId: string,
@@ -36,4 +62,27 @@ export const checkConfirmationExists = async (
     }
   }
   return { exists: false, id: undefined }
+}
+
+export const getTransactionConfirmations = async (
+  safeTxHash: string,
+  networkId: string,
+  composeClient: ComposeClient,
+) => {
+  console.log(safeTxHash, networkId)
+  const executionResult = await composeClient.executeQuery(GET_CONFIRMATIONS(safeTxHash, networkId))
+  console.log(executionResult)
+  if (executionResult?.data !== undefined && executionResult.data !== null) {
+    const transactionIndex: any = executionResult.data.transactionIndex
+    if (transactionIndex.edges.length !== 0) {
+      console.log('Transaction exists')
+      const returnData = { exists: true, confirmationData: transactionIndex.edges[0].node }
+      return returnData
+    } else {
+      console.log("Transaction doesn't exist")
+      return { exists: false, confirmationData: undefined }
+    }
+  }
+  console.log('Error while fetching data from ceramic')
+  return { exists: false, confirmationData: undefined }
 }

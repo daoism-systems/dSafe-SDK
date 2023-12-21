@@ -8,6 +8,7 @@ import handleUpdateConfirmations from './handleUpdateConfirmations.js'
 import handleGetSafe from './handleGetSafe.js'
 import handleGetAllTransactions from './handleGetAllTransactions.js'
 import handleGetTransaction from './handleGetTransaction.js'
+import handleGetTransactionConfirmations from './handleGetConfirmations.js'
 
 const log = new Logger()
 
@@ -25,6 +26,8 @@ const routeHandlers: Record<string, RouteHandler<any>> = {
   '^GET /v1/safes/0x[a-fA-F0-9]+/$': handleGetSafe,
   '^GET /v1/safes/0x[a-fA-F0-9]+/multisig-transactions/$': handleGetAllTransactions,
   '^GET /v1/multisig-transactions/0x[a-fA-F0-9]+/$': handleGetTransaction,
+  '^GET /v1/multisig-transactions/0x[a-fA-F0-9]+/confirmations/$':
+    handleGetTransactionConfirmations,
 }
 
 export default async function handleDSafeRequest(
