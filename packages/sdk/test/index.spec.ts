@@ -6,12 +6,14 @@ import { API_ENDPOINT, STATUS_CODE_200, STATUS_CODE_400 } from '../src/config/co
 import { ERROR_CODE } from '../src/config/ERROR_CODES.js'
 import NETWORKS from '../src/config/networks.js'
 import Logger from '../src/utils/Logger.utils.js'
-import { ethers, getBytes } from 'ethers'
+import { Wallet, ethers, getBytes } from 'ethers'
 import { getSafeSingletonDeployment } from '@safe-global/safe-deployments'
 import { GetSafePayload } from '../src/types/GET_SAFE_PAYLOAD.type.js'
 import { GetAllTransactionsPayload } from '../src/types/GET_ALL_TRANSACTIONS.js'
 import { GetTransactionPayload } from '../src/types/GET_TRANSACTION_PAYLOAD.type.js'
 import { GetTransactionConfirmationsPayload } from '../src/types/GET_TRANSACTION_CONFIRMATIONS_PAYLOAD.type.js'
+import { UpdateDelegatePayload } from '../src/types/CREATE_DELEGATE.type.js'
+import { GetDelegatesPayload } from '../src/types/GET_DELEGATES.type.js'
 dotenv.config({ path: './.env' })
 const log = new Logger()
 // const expect = chai.expect
@@ -21,6 +23,7 @@ const PRIVATE_KEY = process.env.PRIVATE_KEY
 describe('DSafe: Forward API request to Safe API endpoint', () => {
   const chainId: string = NETWORKS.GOERLI
   let dsafe: DSafe
+  let signer: Wallet
   const ceramicNodeNetwork = 'local'
   const demoApiRouteWithoutSlash: string = 'sendTransactions'
   const demoApiRouteWithSlash: string = '/sendTransactions'
@@ -53,6 +56,7 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
   beforeEach(async () => {
     log.info('>> Instantiate Dsafe instance', [])
     dsafe = new DSafe(chainId, ceramicNodeNetwork)
+    signer = new ethers.Wallet(PRIVATE_KEY as string)
     await dsafe.initializeDIDOnNode(PRIVATE_KEY as string)
   })
   it('DSafe instance is initialised with correct chain ID', () => {
@@ -302,5 +306,33 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
       safeTxHash: safeTxHash,
     }
     const data = await dsafe.fetchLegacy('GET', getConfirmationRoute, payload, chainId)
+  })
+  it('Create new delegate', async () => {
+    const addDelegateApiRoute = '/v1/delegates/'
+    const label = 'Signer'
+    const totp = Math.floor(Math.floor(Date.now() / 1000) / 3600)
+    const signatureForDelegate = await signer.signMessage(delegateAddress + totp)
+    const payload: UpdateDelegatePayload = {
+      safe: testSafeOnGoerli,
+      delegate: delegateAddress,
+      delegator: signer.address,
+      signature: signatureForDelegate,
+      label: label,
+      apiData: {
+        safe: testSafeOnGoerli,
+        delegate: delegateAddress,
+        delegator: signer.address,
+        signature: signatureForDelegate,
+        label: label,
+      },
+    }
+    await dsafe.fetchLegacy('POST', addDelegateApiRoute, payload, chainId)
+  })
+  it('Get delegates', async () => {
+    const getDelegateApiRoute = `/v1/delegates/?safe=${testSafeOnGoerli}`
+    const payload: GetDelegatesPayload = {
+      safeAddress: testSafeOnGoerli,
+    }
+    await dsafe.fetchLegacy('GET', getDelegateApiRoute, payload, chainId)
   })
 })

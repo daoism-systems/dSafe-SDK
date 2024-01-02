@@ -1,6 +1,5 @@
 import { type ComposeClient } from '@composedb/client'
 import Logger from '../utils/Logger.utils.js'
-import { type CreateTransactionPayload } from '../types/CREATE_TRANSACTION_PAYLOAD.type.js'
 import handleCreateTransaction from './handleCreateTransaction.js'
 import handleDataDecoder from './handleDataDecoder.js'
 import RouteHandler from '../types/ROUTE_HANDLER.type.js'
@@ -9,6 +8,8 @@ import handleGetSafe from './handleGetSafe.js'
 import handleGetAllTransactions from './handleGetAllTransactions.js'
 import handleGetTransaction from './handleGetTransaction.js'
 import handleGetTransactionConfirmations from './handleGetConfirmations.js'
+import handleUpdateDelegates from './handleUpdateDelegates.js'
+import handleGetDelegates from './handleGetDelegates.js'
 
 const log = new Logger()
 
@@ -28,6 +29,8 @@ const routeHandlers: Record<string, RouteHandler<any>> = {
   '^GET /v1/multisig-transactions/0x[a-fA-F0-9]+/$': handleGetTransaction,
   '^GET /v1/multisig-transactions/0x[a-fA-F0-9]+/confirmations/$':
     handleGetTransactionConfirmations,
+  '^POST /v1/delegates/$': handleUpdateDelegates,
+  '^GET /v1/delegates/?safe=0x[a-fA-F0-9]+$': handleGetDelegates,
 }
 
 export default async function handleDSafeRequest(
