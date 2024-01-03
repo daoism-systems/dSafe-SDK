@@ -117,9 +117,5 @@ admin_seed.txt
 # mac finder extension
 .DS_Store
 
-# Ignore Cermaic Generated schemas
-**.dev.json
-**.dev.js
-
 # Ignore flattened GraphQL file
 99-dsafe-sdk.graphql
