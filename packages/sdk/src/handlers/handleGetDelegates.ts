@@ -1,7 +1,7 @@
-import { ComposeClient } from '@composedb/client'
-import RouteHandler from '../types/ROUTE_HANDLER.type.js'
+import { type ComposeClient } from '@composedb/client'
+import type RouteHandler from '../types/ROUTE_HANDLER.type.js'
 import { getDelegate } from '../composedb/queries/queryDelegates.js'
-import { GetDelegatesPayload } from '../types/GET_DELEGATES.type.js'
+import { type GetDelegatesPayload } from '../types/GET_DELEGATES.type.js'
 import { checkSafeExists } from '../composedb/queries/querySafe.js'
 // GET /v1/delegates/
 
@@ -15,7 +15,7 @@ const handleGetDelegates: RouteHandler<GetDelegatesPayload> = async (
   }
   const safeExist = await checkSafeExists(payload.safeAddress, composeClient)
   console.log(safeExist)
-  let safeStreamId: string | undefined = safeExist.id
+  const safeStreamId: string | undefined = safeExist.id
   const getDelegateResponse = await getDelegate(
     safeStreamId as string,
     network as string,

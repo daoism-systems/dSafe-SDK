@@ -1,7 +1,7 @@
-import { ComposeClient } from '@composedb/client'
-import { DelegateData } from '../../types/DELEGATE_DATA.type.js'
+import { type ComposeClient } from '@composedb/client'
+import { type DelegateData } from '../../types/DELEGATE_DATA.type.js'
 
-const CHECK_DELEGATE_EXISTS = (delegate: string) => `
+const CHECK_DELEGATE_EXISTS = (delegate: string): string => `
 query CheckDelegateExist {
     delegateIndex(first: 1, filters: {where: {delegate: {equalTo: "${delegate}"}}}) {
       edges {
@@ -16,7 +16,7 @@ query CheckDelegateExist {
   }
 `
 
-const GET_ALL_DELEGATES_QUERY = (safeId: string, network: string) => `
+const GET_ALL_DELEGATES_QUERY = (safeId: string, network: string): string => `
 query GetDelegate {
     delegateIndex(
       first: 10
@@ -40,7 +40,7 @@ query GetDelegate {
   }
 `
 
-export const checkDelegateExists = async (delegate: string, composeClient: ComposeClient) => {
+export const checkDelegateExists = async (delegate: string, composeClient: ComposeClient): Promise<any> => {
   const executionResult = await composeClient.executeQuery(CHECK_DELEGATE_EXISTS(delegate))
   if (executionResult?.data !== undefined && executionResult.data !== null) {
     const delegateIndex: any = executionResult.data.delegateIndex
@@ -60,14 +60,14 @@ export const getDelegate = async (
   safeId: string,
   network: string,
   composeClient: ComposeClient,
-) => {
+): Promise<any> => {
   const executionResult = await composeClient.executeQuery(GET_ALL_DELEGATES_QUERY(safeId, network))
   if (executionResult?.data !== undefined && executionResult.data !== null) {
     const delegateIndex: any = executionResult.data.delegateIndex
     console.log(delegateIndex)
     if (delegateIndex?.edges?.length !== 0) {
       console.log('safe exists')
-      const delegateData: Array<DelegateData> = []
+      const delegateData: DelegateData[] = []
       delegateIndex.edges.forEach((i: number) =>
         delegateData.push({
           safe: delegateIndex.edges[i].node.safe.safeAddress,
@@ -75,7 +75,7 @@ export const getDelegate = async (
           delegator: delegateIndex.edges[i].node.delegator.signer,
         }),
       )
-      const returnData = { exists: true, delegateData: delegateData }
+      const returnData = { exists: true, delegateData }
       return returnData
     } else {
       return { exists: false, delegateData: undefined }

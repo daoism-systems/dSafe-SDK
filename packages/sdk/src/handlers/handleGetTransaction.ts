@@ -1,8 +1,8 @@
 // GET /v1/multisig-transactions/{safe_tx_hash}/
 
-import { ComposeClient } from '@composedb/client'
-import { GetTransactionPayload } from '../types/GET_TRANSACTION_PAYLOAD.type.js'
-import RouteHandler from '../types/ROUTE_HANDLER.type.js'
+import { type ComposeClient } from '@composedb/client'
+import { type GetTransactionPayload } from '../types/GET_TRANSACTION_PAYLOAD.type.js'
+import type RouteHandler from '../types/ROUTE_HANDLER.type.js'
 import { getTransaction } from '../composedb/queries/queryTransaction.js'
 
 const networkId = 'eip155:1'

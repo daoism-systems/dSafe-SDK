@@ -1,6 +1,6 @@
 import { type ComposeClient } from '@composedb/client'
 
-const CHECK_CONFIRMATION_EXIST = (signerId: string, transactionId: string) => `
+const CHECK_CONFIRMATION_EXIST = (signerId: string, transactionId: string): string => `
 query CheckConfirmationExist {
     confirmationIndex(
         first: 1
@@ -16,7 +16,7 @@ query CheckConfirmationExist {
 }
 `
 
-const GET_CONFIRMATIONS = (safeTxHash: string, networkId: string) => `
+const GET_CONFIRMATIONS = (safeTxHash: string, networkId: string): string => `
 query GetConfirmations {
 transactionIndex(
   first: 1
@@ -47,7 +47,7 @@ export const checkConfirmationExists = async (
   signerId: string,
   transactionId: string,
   composeClient: ComposeClient,
-) => {
+): Promise<any> => {
   const executionResult = await composeClient.executeQuery(
     CHECK_CONFIRMATION_EXIST(signerId, transactionId),
   )
@@ -68,7 +68,7 @@ export const getTransactionConfirmations = async (
   safeTxHash: string,
   networkId: string,
   composeClient: ComposeClient,
-) => {
+): Promise<any> => {
   console.log(safeTxHash, networkId)
   const executionResult = await composeClient.executeQuery(GET_CONFIRMATIONS(safeTxHash, networkId))
   console.log(executionResult)
@@ -79,7 +79,7 @@ export const getTransactionConfirmations = async (
       const returnData = { exists: true, confirmationData: transactionIndex.edges[0].node }
       return returnData
     } else {
-      console.log("Transaction doesn't exist")
+      console.log('Transaction doesn\'t exist')
       return { exists: false, confirmationData: undefined }
     }
   }

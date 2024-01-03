@@ -41,5 +41,5 @@ const srcJSFilePath = OUT_JS_DIR // Update with actual source file path
 const destJSONFilePath = SDK_DEFINITIONS_JSON_FILE
 const destJSFilePath = SDK_DEFINITIONS_JS_FILE
 
-moveFile(srcJSONFilePath, destJSONFilePath)
-moveFile(srcJSFilePath, destJSFilePath)
+moveFile(srcJSONFilePath, destJSONFilePath).then(console.log).catch(console.error);
+moveFile(srcJSFilePath, destJSFilePath).then(console.log).catch(console.error);

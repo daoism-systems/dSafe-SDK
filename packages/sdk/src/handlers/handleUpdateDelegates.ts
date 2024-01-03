@@ -1,13 +1,10 @@
-import { ComposeClient } from '@composedb/client'
-import RouteHandler from '../types/ROUTE_HANDLER.type.js'
-import { checkTransactionBasedOnSafeTxHash } from '../composedb/queries/queryTransaction.js'
-import { composeConfirmation } from '../composedb/mutations/mutateConfirmation.js'
-import { checkConfirmationExists } from '../composedb/queries/queryConfirmation.js'
+import { type ComposeClient } from '@composedb/client'
+import type RouteHandler from '../types/ROUTE_HANDLER.type.js'
 import { checkSignerExists } from '../composedb/queries/querySigner.js'
 import { composeSigner } from '../composedb/mutations/mutateSigner.js'
 import { API_ENDPOINT } from '../config/constants.js'
 import axios from 'axios'
-import { UpdateDelegatePayload } from '../types/CREATE_DELEGATE.type.js'
+import { type UpdateDelegatePayload } from '../types/CREATE_DELEGATE.type.js'
 import { composeDelegate } from '../composedb/mutations/mutateDelegate.js'
 import { checkDelegateExists } from '../composedb/queries/queryDelegates.js'
 import { checkSafeExists } from '../composedb/queries/querySafe.js'
@@ -30,15 +27,15 @@ const handleUpdateDelegates: RouteHandler<UpdateDelegatePayload> = async (
   const data = response.data
   // check if safe exists
   const safeExist = await checkSafeExists(payload?.safe as string, composeClient)
-  let safeStreamId: string | undefined = safeExist.id
+  const safeStreamId: string | undefined = safeExist.id
   if (!safeExist.exists) {
-    throw Error("Safe doesn't exist")
+    throw Error('Safe doesn\'t exist')
   }
   // add delegate to the transaction
   const signerExist = await checkSignerExists(payload?.delegator as string, composeClient)
   let signerStreamId: string | undefined = signerExist.id
-  if (!signerExist.exists && data.owners.includes(payload?.delegator)) {
-    console.log("Sender is signer but isn't Signer entity isn't created for the sender")
+  if (!signerExist.exists && (data.owners.includes(payload?.delegator) === true)) {
+    console.log('Sender is signer but isn\'t Signer entity isn\'t created for the sender')
     const input = {
       content: {
         signer: payload?.delegator,
@@ -53,7 +50,7 @@ const handleUpdateDelegates: RouteHandler<UpdateDelegatePayload> = async (
     content: {
       delegate: payload?.delegate,
       delegatorID: signerStreamId,
-      network: network,
+      network,
       safeID: safeStreamId,
     },
   }

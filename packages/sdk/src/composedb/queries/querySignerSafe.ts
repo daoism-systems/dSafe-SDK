@@ -1,10 +1,10 @@
-import { ComposeClient } from '@composedb/client'
+import { type ComposeClient } from '@composedb/client'
 
 const CHECK_SIGNER_SAFE_EXISTS = (
   signerStreamId: string,
   safeStreamId: string,
   networkId: string,
-) => `
+): string => `
 query CheckSignerSafeExists {
     signerSafeRelationshipIndex(
       first: 1
@@ -27,7 +27,7 @@ export const checkSignerSafeExists = async (
   safeId: string,
   networkId: string,
   composeClient: ComposeClient,
-) => {
+): Promise<any> => {
   const executionResult = await composeClient.executeQuery(
     CHECK_SIGNER_SAFE_EXISTS(signerId, safeId, networkId),
   )

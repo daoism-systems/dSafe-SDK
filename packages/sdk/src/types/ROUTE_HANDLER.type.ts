@@ -1,5 +1,4 @@
-import { ComposeClient } from '@composedb/client'
-import { CreateTransactionPayload } from './CREATE_TRANSACTION_PAYLOAD.type.js'
+import { type ComposeClient } from '@composedb/client'
 
 type RouteHandler<T> = (
   composeClient: ComposeClient,

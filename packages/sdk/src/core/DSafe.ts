@@ -28,9 +28,7 @@ export default class DSafe {
     ceramicNetworkOverride?: string,
   ) {
     const ceramicNodeUrlToUse =
-      ceramicNetworkOverride === undefined
-        ? CERAMIC_NETWORKS[ceramicNetwork]
-        : ceramicNetworkOverride
+      ceramicNetworkOverride ?? CERAMIC_NETWORKS[ceramicNetwork]
     this.initialised = true
     this.network = network
     this.ceramicClient = new CeramicClient(ceramicNodeUrlToUse)

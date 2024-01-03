@@ -2,7 +2,7 @@ import { type ComposeClient } from '@composedb/client'
 
 type CreateSignerSafeInput = Record<string, any>
 
-const COMPOSE_SIGNER_SAFE = () => `
+const COMPOSE_SIGNER_SAFE = (): string => `
 mutation CreateSignerSafeRelationship($input: CreateSignerSafeRelationshipInput!) {
     createSignerSafeRelationship(input: $input) {
       document {

@@ -1,6 +1,6 @@
-import { ComposeClient } from '@composedb/client'
-import RouteHandler from '../types/ROUTE_HANDLER.type.js'
-import { UPDATE_CONFIRMATION_PAYLOAD } from '../types/UPDATE_CONFIRMATION_PAYLOAD.type.js'
+import { type ComposeClient } from '@composedb/client'
+import type RouteHandler from '../types/ROUTE_HANDLER.type.js'
+import { type UPDATE_CONFIRMATION_PAYLOAD } from '../types/UPDATE_CONFIRMATION_PAYLOAD.type.js'
 import { checkTransactionBasedOnSafeTxHash } from '../composedb/queries/queryTransaction.js'
 import { composeConfirmation } from '../composedb/mutations/mutateConfirmation.js'
 import { checkConfirmationExists } from '../composedb/queries/queryConfirmation.js'
@@ -22,7 +22,7 @@ const handleUpdateConfirmations: RouteHandler<UPDATE_CONFIRMATION_PAYLOAD> = asy
   )
   console.log(transactionExists)
   if (!transactionExists.exists) {
-    throw Error("Transaction doesn't exist")
+    throw Error('Transaction doesn\'t exist')
   }
   // todo: use transaction stream ID to fetch safe instead of taking it from user
   let response: any
@@ -36,8 +36,8 @@ const handleUpdateConfirmations: RouteHandler<UPDATE_CONFIRMATION_PAYLOAD> = asy
   // add confirmation to the transaction
   const signerExist = await checkSignerExists(payload?.sender as string, composeClient)
   let signerStreamId: string | undefined = signerExist.id
-  if (!signerExist.exists && data.owners.includes(payload?.sender)) {
-    console.log("Sender is signer but isn't Signer entity isn't created for the sender")
+  if (!signerExist.exists && (data.owners.includes(payload?.sender) === true)) {
+    console.log('Sender is signer but isn\'t Signer entity isn\'t created for the sender')
     const input = {
       content: {
         signer: payload?.sender,
@@ -47,6 +47,7 @@ const handleUpdateConfirmations: RouteHandler<UPDATE_CONFIRMATION_PAYLOAD> = asy
     const signerCreated = await checkSignerExists(payload?.sender as string, composeClient)
     console.log(`Signer Created: ${signerCreated.exists}`)
     signerStreamId = signerCreated.id
+    console.log(`Signer Stream ID: ${signerStreamId}`);
   }
   const confirmationInput = {
     content: {

@@ -2,7 +2,7 @@ import { type ComposeClient } from '@composedb/client'
 
 type CreateSafeInput = Record<string, any>
 
-const COMPOSE_SAFE = () => `
+const COMPOSE_SAFE = (): string => `
 mutation CreateSafe($input: CreateSafeInput!) {
     createSafe(input: $input) {
       document {

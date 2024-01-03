@@ -1,9 +1,9 @@
 // GET /v1/multisig-transactions/{safe_tx_hash}/confirmations/
 // GET /v1/multisig-transactions/{safe_tx_hash}/
 
-import { ComposeClient } from '@composedb/client'
-import { GetTransactionConfirmationsPayload } from '../types/GET_TRANSACTION_CONFIRMATIONS_PAYLOAD.type.js'
-import RouteHandler from '../types/ROUTE_HANDLER.type.js'
+import { type ComposeClient } from '@composedb/client'
+import { type GetTransactionConfirmationsPayload } from '../types/GET_TRANSACTION_CONFIRMATIONS_PAYLOAD.type.js'
+import type RouteHandler from '../types/ROUTE_HANDLER.type.js'
 import { getTransactionConfirmations } from '../composedb/queries/queryConfirmation.js'
 
 const networkId = 'eip155:1'

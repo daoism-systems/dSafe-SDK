@@ -6,14 +6,14 @@ import { API_ENDPOINT, STATUS_CODE_200, STATUS_CODE_400 } from '../src/config/co
 import { ERROR_CODE } from '../src/config/ERROR_CODES.js'
 import NETWORKS from '../src/config/networks.js'
 import Logger from '../src/utils/Logger.utils.js'
-import { Wallet, ethers, getBytes } from 'ethers'
+import { type Wallet, ethers, getBytes } from 'ethers'
 import { getSafeSingletonDeployment } from '@safe-global/safe-deployments'
-import { GetSafePayload } from '../src/types/GET_SAFE_PAYLOAD.type.js'
-import { GetAllTransactionsPayload } from '../src/types/GET_ALL_TRANSACTIONS.js'
-import { GetTransactionPayload } from '../src/types/GET_TRANSACTION_PAYLOAD.type.js'
-import { GetTransactionConfirmationsPayload } from '../src/types/GET_TRANSACTION_CONFIRMATIONS_PAYLOAD.type.js'
-import { UpdateDelegatePayload } from '../src/types/CREATE_DELEGATE.type.js'
-import { GetDelegatesPayload } from '../src/types/GET_DELEGATES.type.js'
+import { type GetSafePayload } from '../src/types/GET_SAFE_PAYLOAD.type.js'
+import { type GetAllTransactionsPayload } from '../src/types/GET_ALL_TRANSACTIONS.js'
+import { type GetTransactionPayload } from '../src/types/GET_TRANSACTION_PAYLOAD.type.js'
+import { type GetTransactionConfirmationsPayload } from '../src/types/GET_TRANSACTION_CONFIRMATIONS_PAYLOAD.type.js'
+import { type UpdateDelegatePayload } from '../src/types/CREATE_DELEGATE.type.js'
+import { type GetDelegatesPayload } from '../src/types/GET_DELEGATES.type.js'
 dotenv.config({ path: './.env' })
 const log = new Logger()
 // const expect = chai.expect
@@ -212,7 +212,7 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
         signature,
       },
     }
-    const result = await dsafe.fetchLegacy('POST', createTransactionRoute, payload, chainId)
+    await dsafe.fetchLegacy('POST', createTransactionRoute, payload, chainId)
   }, 100000)
   it('should be able to add new confirmation to existing transaction', async () => {
     const safeAddress = '0xa192aBe4667FC4d11e46385902309cd7421997ed'
@@ -263,10 +263,10 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
 
     const payload = {
       apiData: {
-        signature: signature,
+        signature,
       },
       safe: safeAddress,
-      signature: signature,
+      signature,
       safe_tx_hash: safeTrxHash,
       sender: signer.address,
     }
@@ -282,6 +282,7 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
       address: safeAddress,
     }
     const data = await dsafe.fetchLegacy('GET', getSafeRoute, payload, chainId)
+    console.log(data);
   })
   it('get all transactions', async () => {
     const safeAddress = '0xa192aBe4667FC4d11e46385902309cd7421997ed'
@@ -290,22 +291,25 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
       address: safeAddress,
     }
     const data = await dsafe.fetchLegacy('GET', getTransactionsRoute, payload, chainId)
+    console.log(data);
   })
   it('Get a transaction using safeTxHash', async () => {
     const safeTxHash = '0x8cac27eca93ebddc0bb7edb62af9c5adfa7915ccca2ffe25adfe76e31a7835de'
     const getTransactionRoute = `/v1/multisig-transactions/${safeTxHash}/`
     const payload: GetTransactionPayload = {
-      safeTxHash: safeTxHash,
+      safeTxHash,
     }
     const data = await dsafe.fetchLegacy('GET', getTransactionRoute, payload, chainId)
+    console.log(data);
   })
   it('Get confirmations for a safeTrxHash', async () => {
     const safeTxHash = '0x8cac27eca93ebddc0bb7edb62af9c5adfa7915ccca2ffe25adfe76e31a7835de'
     const getConfirmationRoute = `/v1/multisig-transactions/${safeTxHash}/confirmations/`
     const payload: GetTransactionConfirmationsPayload = {
-      safeTxHash: safeTxHash,
+      safeTxHash,
     }
     const data = await dsafe.fetchLegacy('GET', getConfirmationRoute, payload, chainId)
+    console.log(data);
   })
   it('Create new delegate', async () => {
     const addDelegateApiRoute = '/v1/delegates/'
@@ -317,13 +321,13 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
       delegate: delegateAddress,
       delegator: signer.address,
       signature: signatureForDelegate,
-      label: label,
+      label,
       apiData: {
         safe: testSafeOnGoerli,
         delegate: delegateAddress,
         delegator: signer.address,
         signature: signatureForDelegate,
-        label: label,
+        label,
       },
     }
     await dsafe.fetchLegacy('POST', addDelegateApiRoute, payload, chainId)

@@ -1,5 +1,5 @@
-import { ComposeClient } from '@composedb/client'
-import { CreateTransactionPayload } from '../types/CREATE_TRANSACTION_PAYLOAD.type.js'
+import { type ComposeClient } from '@composedb/client'
+import { type CreateTransactionPayload } from '../types/CREATE_TRANSACTION_PAYLOAD.type.js'
 import { checkSafeExists } from '../composedb/queries/querySafe.js'
 import { checkSignerExists } from '../composedb/queries/querySigner.js'
 import { composeSafe } from '../composedb/mutations/mutateSafe.js'
@@ -15,7 +15,7 @@ import { composeTransaction } from '../composedb/mutations/mutateTransaction.js'
 import { checkTransactionExists } from '../composedb/queries/queryTransaction.js'
 import { composeConfirmation } from '../composedb/mutations/mutateConfirmation.js'
 import { checkConfirmationExists } from '../composedb/queries/queryConfirmation.js'
-import RouteHandler from '../types/ROUTE_HANDLER.type.js'
+import type RouteHandler from '../types/ROUTE_HANDLER.type.js'
 import { composeSignerSafe } from '../composedb/mutations/mutateSignerSafe.js'
 import { checkSignerSafeExists } from '../composedb/queries/querySignerSafe.js'
 
@@ -70,8 +70,8 @@ const handleCreateTransaction: RouteHandler<CreateTransactionPayload> = async (
         guard: data.guard,
         version: data.version,
         totalTransactions: data.nonce, // currently assuming users do not skip any nonce value
-        nativeTokenBalance: nativeTokenBalance,
-        deployedBlockNumber: deployedBlockNumber,
+        nativeTokenBalance,
+        deployedBlockNumber,
       },
     }
     console.log('Creating new safe on ComposeDB...')
@@ -84,8 +84,8 @@ const handleCreateTransaction: RouteHandler<CreateTransactionPayload> = async (
   const signerExist = await checkSignerExists(payload.sender, composeClient)
   let signerStreamId: string | undefined = signerExist.id
   let signerSafeStreamId: string | undefined
-  if (!signerExist.exists && data.owners.includes(payload.sender)) {
-    console.log("Sender is signer but isn't Signer entity isn't created for the sender")
+  if (!signerExist.exists && (data.owners.includes(payload.sender) === true)) {
+    console.log('Sender is signer but isn\'t Signer entity isn\'t created for the sender')
     const input = {
       content: {
         signer: payload.sender,
@@ -114,6 +114,7 @@ const handleCreateTransaction: RouteHandler<CreateTransactionPayload> = async (
     )
     console.log(`Signer Safe relationship: ${signerSafeRelationshipCreated.exists}`)
     signerSafeStreamId = signerSafeRelationshipCreated.id
+    console.log(`Signer Safe Relationship Stream ID: ${signerSafeStreamId}`);
   }
 
   console.log(safeStreamId, signerStreamId)
@@ -129,12 +130,10 @@ const handleCreateTransaction: RouteHandler<CreateTransactionPayload> = async (
       safeTxGas: payload.safeTxGas,
       value: payload.value,
       refundReceiver:
-        payload.refundReceiver === undefined
-          ? ZERO_ADDRESS_REFUND_RECEIVER
-          : payload.refundReceiver,
-      data: payload.data === undefined ? EMPTY_TRANSACTION_DATA : payload.data,
+        payload.refundReceiver ?? ZERO_ADDRESS_REFUND_RECEIVER,
+      data: payload.data ?? EMPTY_TRANSACTION_DATA,
       operation: payload.operation,
-      gasToken: payload.gasToken === undefined ? ZERO_ADDRESS_GAS_TOKEN : payload.gasToken,
+      gasToken: payload.gasToken ?? ZERO_ADDRESS_GAS_TOKEN,
       nonce: payload.nonce,
       sender: payload.sender,
       signature: payload.signature,

@@ -1,6 +1,6 @@
 import { type ComposeClient } from '@composedb/client'
 
-const CHECK_SAFE_EXISTS_QUERY = (safeAddress: string) => `
+const CHECK_SAFE_EXISTS_QUERY = (safeAddress: string): string => `
 query GetSafe {
   safeIndex(filters: {where: {safeAddress: {equalTo: "${safeAddress}"}}}, first: 1) {
       edges {
@@ -13,7 +13,7 @@ query GetSafe {
 }
 `
 
-const GET_SAFE_QUERY = (safeAddress: string) => `
+const GET_SAFE_QUERY = (safeAddress: string): string => `
 query GetSafe {
   safeIndex(filters: {where: {safeAddress: {equalTo: "${safeAddress}"}}}, first: 1) {
     edges {
@@ -46,7 +46,7 @@ query GetSafe {
 `
 
 // Using the query in a component
-export const checkSafeExists = async (safeAddress: string, composeClient: ComposeClient) => {
+export const checkSafeExists = async (safeAddress: string, composeClient: ComposeClient): Promise<any> => {
   const executionResult = await composeClient.executeQuery(CHECK_SAFE_EXISTS_QUERY(safeAddress))
   if (executionResult?.data !== undefined && executionResult.data !== null) {
     const safeIndex: any = executionResult.data.safeIndex
@@ -62,7 +62,7 @@ export const checkSafeExists = async (safeAddress: string, composeClient: Compos
 }
 
 // get safe
-export const getSafe = async (safeAddress: string, composeClient: ComposeClient) => {
+export const getSafe = async (safeAddress: string, composeClient: ComposeClient): Promise<any> => {
   const executionResult = await composeClient.executeQuery(GET_SAFE_QUERY(safeAddress))
   if (executionResult?.data !== undefined && executionResult.data !== null) {
     const safeIndex: any = executionResult.data.safeIndex
@@ -79,7 +79,7 @@ export const getSafe = async (safeAddress: string, composeClient: ComposeClient)
         guard: safeIndex.edges[0].node.guard,
         version: safeIndex.edges[0].node.version,
       }
-      const returnData = { exists: true, safeData: safeData }
+      const returnData = { exists: true, safeData }
       return returnData
     } else {
       return { exists: false, safeData: undefined }

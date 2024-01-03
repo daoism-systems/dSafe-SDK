@@ -1,6 +1,6 @@
 import { type ComposeClient } from '@composedb/client'
 
-const CHECK_TRANSACTION_EXIST = (nonce: number, safeId: string) => `
+const CHECK_TRANSACTION_EXIST = (nonce: number, safeId: string): string => `
 query CheckTransactionExist {
     transactionIndex(
         first: 1
@@ -16,7 +16,7 @@ query CheckTransactionExist {
 }
 `
 
-const CHECK_TRANSACTION_EXIST_WITH_SAFE_TX_HASH = (safeTxHash: string) => `
+const CHECK_TRANSACTION_EXIST_WITH_SAFE_TX_HASH = (safeTxHash: string): string => `
 query CheckTransactionExist {
     transactionIndex(
         first: 1
@@ -32,7 +32,7 @@ query CheckTransactionExist {
 }
 `
 
-const GET_TRANSACTIONS_OF_SAFE = (safeId: string, networkId: string) => `
+const GET_TRANSACTIONS_OF_SAFE = (safeId: string, networkId: string): string => `
 query GetTransactionsOnSafe {
 transactionIndex(
   first: 100
@@ -75,7 +75,7 @@ transactionIndex(
 }
 `
 
-const GET_TRANSACTION = (safeTxHash: string, networkId: string) => `
+const GET_TRANSACTION = (safeTxHash: string, networkId: string): string => `
 query GetTransaction {
 transactionIndex(
   first: 1
@@ -122,7 +122,7 @@ transactionIndex(
 export const checkTransactionBasedOnSafeTxHash = async (
   safeTxHash: string,
   composeClient: ComposeClient,
-) => {
+): Promise<any> => {
   const executionResult = await composeClient.executeQuery(
     CHECK_TRANSACTION_EXIST_WITH_SAFE_TX_HASH(safeTxHash),
   )
@@ -145,7 +145,7 @@ export const checkTransactionExists = async (
   nonce: number,
   safeId: string,
   composeClient: ComposeClient,
-) => {
+): Promise<any> => {
   const executionResult = await composeClient.executeQuery(CHECK_TRANSACTION_EXIST(nonce, safeId))
   if (executionResult?.data !== undefined && executionResult.data !== null) {
     const transactionIndex: any = executionResult.data.transactionIndex
@@ -164,7 +164,7 @@ export const getAllTransactions = async (
   safeId: string,
   networkId: string,
   composeClient: ComposeClient,
-) => {
+): Promise<any> => {
   const executionResult = await composeClient.executeQuery(
     GET_TRANSACTIONS_OF_SAFE(safeId, networkId),
   )
@@ -185,7 +185,7 @@ export const getTransaction = async (
   safeTxHash: string,
   networkId: string,
   composeClient: ComposeClient,
-) => {
+): Promise<any> => {
   console.log(safeTxHash, networkId)
   const executionResult = await composeClient.executeQuery(GET_TRANSACTION(safeTxHash, networkId))
   console.log(executionResult)
@@ -196,7 +196,7 @@ export const getTransaction = async (
       const returnData = { exists: true, transactionData: transactionIndex.edges[0].node }
       return returnData
     } else {
-      console.log("Transaction doesn't exist")
+      console.log('Transaction doesn\'t exist')
       return { exists: false, transactionData: undefined }
     }
   }

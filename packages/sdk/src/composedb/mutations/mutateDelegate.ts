@@ -1,8 +1,8 @@
-import { ComposeClient } from '@composedb/client'
+import { type ComposeClient } from '@composedb/client'
 
 type CreateDelegateInput = Record<string, any>
 
-const COMPOSE_DELEGATE = () => `
+const COMPOSE_DELEGATE = (): string => `
 mutation ComposeDelegate ($input: CreateDelegateInput!) {
     createDelegate(
       input: $input
