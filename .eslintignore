@@ -5,4 +5,5 @@ coverage
 .nyc_output
 package.json
 tsconfig.json
+**/*.dev.json
 node_modules/
