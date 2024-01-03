@@ -1,10 +1,15 @@
 import { type ComposeClient } from '@composedb/client'
 import Logger from '../utils/Logger.utils.js'
-import { type CreateTransactionPayload } from '../types/CREATE_TRANSACTION_PAYLOAD.type.js'
 import handleCreateTransaction from './handleCreateTransaction.js'
 import handleDataDecoder from './handleDataDecoder.js'
-import RouteHandler from '../types/ROUTE_HANDLER.type.js'
+import type RouteHandler from '../types/ROUTE_HANDLER.type.js'
 import handleUpdateConfirmations from './handleUpdateConfirmations.js'
+import handleGetSafe from './handleGetSafe.js'
+import handleGetAllTransactions from './handleGetAllTransactions.js'
+import handleGetTransaction from './handleGetTransaction.js'
+import handleGetTransactionConfirmations from './handleGetConfirmations.js'
+import handleUpdateDelegates from './handleUpdateDelegates.js'
+import handleGetDelegates from './handleGetDelegates.js'
 
 const log = new Logger()
 
@@ -16,9 +21,16 @@ export function handleDSafeLog(apiRoute: string): void {
 // Note: TypeScript does not support regex as object keys directly, hence using strings
 // keep adding new handlers here to handle more API routes
 const routeHandlers: Record<string, RouteHandler<any>> = {
-  '^v1/data-decoder/$': handleDataDecoder,
-  '^v1/safes/([a-zA-Z0-9]+)/multisig-transactions/$': handleCreateTransaction,
-  '^/v1/multisig-transactions/[a-zA-Z0-9]+/confirmations/$': handleUpdateConfirmations,
+  '^GET /v1/data-decoder/$': handleDataDecoder,
+  '^POST /v1/safes/0x[a-fA-F0-9]+/multisig-transactions/$': handleCreateTransaction,
+  '^POST /v1/multisig-transactions/0x[a-fA-F0-9]+/confirmations/$': handleUpdateConfirmations,
+  '^GET /v1/safes/0x[a-fA-F0-9]+/$': handleGetSafe,
+  '^GET /v1/safes/0x[a-fA-F0-9]+/multisig-transactions/$': handleGetAllTransactions,
+  '^GET /v1/multisig-transactions/0x[a-fA-F0-9]+/$': handleGetTransaction,
+  '^GET /v1/multisig-transactions/0x[a-fA-F0-9]+/confirmations/$':
+    handleGetTransactionConfirmations,
+  '^POST /v1/delegates/$': handleUpdateDelegates,
+  '^GET /v1/delegates/?safe=0x[a-fA-F0-9]+$': handleGetDelegates,
 }
 
 export default async function handleDSafeRequest(
@@ -29,13 +41,14 @@ export default async function handleDSafeRequest(
   network?: string,
 ): Promise<boolean> {
   console.log('Handling:', apiRoute)
+  const apiRouteWithRequestType = `${httpMethod} ${apiRoute}`
   for (const pattern in routeHandlers) {
-    if (new RegExp(pattern).test(apiRoute)) {
-      console.log(`Implementing route: ${apiRoute}`)
+    if (new RegExp(pattern).test(apiRouteWithRequestType)) {
+      console.log(`Implementing route: ${apiRouteWithRequestType}`)
       await routeHandlers[pattern](composeClient, payload, network)
       return true
     }
   }
-  console.log(`No handler found for route: ${apiRoute}`)
+  console.log(`No handler found for route: ${apiRouteWithRequestType}`)
   return true
 }

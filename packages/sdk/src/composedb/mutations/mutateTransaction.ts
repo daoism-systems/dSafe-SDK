@@ -2,7 +2,7 @@ import { type ComposeClient } from '@composedb/client'
 
 type CreateTransactionInput = Record<string, any>
 
-const COMPOSE_TRANSACTION = () => `
+const COMPOSE_TRANSACTION = (): string => `
 mutation CreateTransaction($input: CreateTransactionInput!) {
     createTransaction(input: $input) {
       document {

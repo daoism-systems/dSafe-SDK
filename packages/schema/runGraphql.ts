@@ -1,12 +1,12 @@
 import { serveEncodedDefinition } from '@composedb/devtools-node'
 
-import { CERAMIC_NODE_URL, OUT_JSON_DIR } from './constants.js'
+import { CERAMIC_NODE_URL } from './constants.js'
 import { fromString } from 'uint8arrays'
 import { DID } from 'dids'
 import { getResolver } from 'key-did-resolver'
 import { Ed25519Provider } from 'key-did-provider-ed25519'
 
-async function runGraphql() {
+async function runGraphql(): Promise<void> {
   /**
    * Runs GraphiQL server to view & query composites.
    */
@@ -27,7 +27,7 @@ async function runGraphql() {
     throw Error('Invalid File Path')
   }
   const server = await serveEncodedDefinition({
-    ceramicURL: CERAMIC_NODE_URL || 'http://localhost:7007',
+    ceramicURL: CERAMIC_NODE_URL ?? 'http://localhost:7007',
     graphiql: true,
     path: process.env.FILE_PATH,
     did,
@@ -37,8 +37,8 @@ async function runGraphql() {
   console.log(`Server started on http://localhost:${process.env.PORT_NUMBER}`)
 
   process.on('SIGTERM', () => {
-    server.stop()
+    server.stop().then(console.log).catch(console.error)
   })
 }
 
-runGraphql()
+runGraphql().then(console.log).catch(console.error);

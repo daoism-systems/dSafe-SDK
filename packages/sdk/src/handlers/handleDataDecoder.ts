@@ -1,7 +1,7 @@
-import { ComposeClient } from '@composedb/client'
+import { type ComposeClient } from '@composedb/client'
 import Logger from '../utils/Logger.utils.js'
 import { handleDSafeLog } from './handler.js'
-import RouteHandler from '../types/ROUTE_HANDLER.type.js'
+import type RouteHandler from '../types/ROUTE_HANDLER.type.js'
 
 const log = new Logger()
 

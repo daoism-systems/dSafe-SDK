@@ -2,7 +2,7 @@ import { type ComposeClient } from '@composedb/client'
 
 type CreateConfirmationInput = Record<string, any>
 
-const COMPOSE_CONFIRMATION = () => `
+const COMPOSE_CONFIRMATION = (): string => `
 mutation CreateConfirmation($input: CreateConfirmationInput!) {
     createConfirmation(input: $input) {
       document {

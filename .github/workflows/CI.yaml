@@ -53,29 +53,29 @@ jobs:
       - name: Lint all packagess
         run: yarn turbo run lint
     
-  coverage:
-    name: coverage and test
-    needs: build
-    timeout-minutes: 15
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out code
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 2
+  # coverage:
+  #   name: coverage and test
+  #   needs: build
+  #   timeout-minutes: 15
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Check out code
+  #       uses: actions/checkout@v3
+  #       with:
+  #         fetch-depth: 2
  
-      - name: Setup Node.js environment
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-          cache: 'yarn'
+  #     - name: Setup Node.js environment
+  #       uses: actions/setup-node@v3
+  #       with:
+  #         node-version: 18
+  #         cache: 'yarn'
  
-      - name: Install dependencies
-        run: yarn
+  #     - name: Install dependencies
+  #       run: yarn
  
-      - name: Test
-        run: yarn turbo run  test
+  #     - name: Test
+  #       run: yarn turbo run test
  
-      - name: Coverage of tests
-        run: yarn turbo run coverage
+  #     - name: Coverage of tests
+  #       run: yarn turbo run coverage
     

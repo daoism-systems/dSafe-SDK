@@ -1,6 +1,6 @@
 import { type ComposeClient } from '@composedb/client'
 
-const CHECK_SIGNER_EXISTS_QUERY = (signer: string) => `
+const CHECK_SIGNER_EXISTS_QUERY = (signer: string): string => `
 query GetSigner {
     signerIndex(filters: {where: {signer: {equalTo: "${signer}"}}}, first: 1) {
       edges {
@@ -14,7 +14,7 @@ query GetSigner {
 `
 
 // Using the query in a component
-export const checkSignerExists = async (signer: string, composeClient: ComposeClient) => {
+export const checkSignerExists = async (signer: string, composeClient: ComposeClient): Promise<any> => {
   const executionResult = await composeClient.executeQuery(CHECK_SIGNER_EXISTS_QUERY(signer))
   console.log(executionResult)
   if (executionResult?.data !== undefined && executionResult.data !== null) {
