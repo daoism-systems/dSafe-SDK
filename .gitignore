@@ -119,3 +119,5 @@ admin_seed.txt
 
 # Ignore flattened GraphQL file
 99-dsafe-sdk.graphql
+
+.vscode/
