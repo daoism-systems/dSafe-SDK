@@ -6,7 +6,7 @@ import { API_ENDPOINT, STATUS_CODE_200, STATUS_CODE_400 } from '../src/config/co
 import { ERROR_CODE } from '../src/config/ERROR_CODES.js'
 import NETWORKS from '../src/config/networks.js'
 import Logger from '../src/utils/Logger.utils.js'
-import { type Wallet, ethers, getBytes } from 'ethers'
+import { type Wallet, ethers } from 'ethers'
 import { getSafeSingletonDeployment } from '@safe-global/safe-deployments'
 import { type GetSafePayload } from '../src/types/GET_SAFE_PAYLOAD.type.js'
 import { type GetAllTransactionsPayload } from '../src/types/GET_ALL_TRANSACTIONS.js'
@@ -14,6 +14,7 @@ import { type GetTransactionPayload } from '../src/types/GET_TRANSACTION_PAYLOAD
 import { type GetTransactionConfirmationsPayload } from '../src/types/GET_TRANSACTION_CONFIRMATIONS_PAYLOAD.type.js'
 import { type UpdateDelegatePayload } from '../src/types/CREATE_DELEGATE.type.js'
 import { type GetDelegatesPayload } from '../src/types/GET_DELEGATES.type.js'
+import { hexValue } from 'ethers/lib/utils.js'
 dotenv.config({ path: './.env' })
 const log = new Logger()
 // const expect = chai.expect
@@ -166,7 +167,8 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
       nonce: 13,
     }
     const provider = ethers.getDefaultProvider(chainId)
-    const signer = new ethers.BaseWallet(new ethers.SigningKey(PRIVATE_KEY as string), provider)
+    // const signer = new ethers.BaseWallet(new ethers.SigningKey(PRIVATE_KEY as string), provider)
+    const signer = new ethers.Wallet(PRIVATE_KEY as string, provider)
     const safeInstance = new ethers.Contract(safeAddress, safeAbi, signer)
     const safeTrxHash = await safeInstance.getTransactionHash(
       trxInput.to,
@@ -180,7 +182,7 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
       trxInput.refundReceiver,
       trxInput.nonce,
     )
-    const signature = (await signer.signMessage(getBytes(safeTrxHash)))
+    const signature = (await signer.signMessage(hexValue(safeTrxHash)))
       .replace(/1b$/, '1f')
       .replace(/1c$/, '20')
     // todo: add correct payload
@@ -236,7 +238,8 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
     console.log('This is working')
     const provider = ethers.getDefaultProvider(chainId)
     console.log('This is working')
-    const signer = new ethers.BaseWallet(new ethers.SigningKey(PRIVATE_KEY as string), provider)
+    // const signer = new ethers.BaseWallet(new ethers.SigningKey(PRIVATE_KEY as string), provider)
+    const signer = new ethers.Wallet(PRIVATE_KEY as string, provider)
     const safeInstance = new ethers.Contract(safeAddress, safeAbi, signer)
     console.log('This is working')
     const safeTrxHash = await safeInstance.getTransactionHash(
@@ -256,7 +259,7 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
     const updateConfirmationRoute = `/v1/multisig-transactions/${safeTrxHash}/confirmations/`
     console.log(safeTrxHash)
     console.log('This is working')
-    const signature = (await signer.signMessage(getBytes(safeTrxHash)))
+    const signature = (await signer.signMessage(hexValue(safeTrxHash)))
       .replace(/1b$/, '1f')
       .replace(/1c$/, '20')
     console.log('This is working')
@@ -282,7 +285,7 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
       address: safeAddress,
     }
     const data = await dsafe.fetchLegacy('GET', getSafeRoute, payload, chainId)
-    console.log(data);
+    console.log(data)
   })
   it('get all transactions', async () => {
     const safeAddress = '0xa192aBe4667FC4d11e46385902309cd7421997ed'
@@ -291,7 +294,7 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
       address: safeAddress,
     }
     const data = await dsafe.fetchLegacy('GET', getTransactionsRoute, payload, chainId)
-    console.log(data);
+    console.log(data)
   })
   it('Get a transaction using safeTxHash', async () => {
     const safeTxHash = '0x8cac27eca93ebddc0bb7edb62af9c5adfa7915ccca2ffe25adfe76e31a7835de'
@@ -300,7 +303,7 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
       safeTxHash,
     }
     const data = await dsafe.fetchLegacy('GET', getTransactionRoute, payload, chainId)
-    console.log(data);
+    console.log(data)
   })
   it('Get confirmations for a safeTrxHash', async () => {
     const safeTxHash = '0x8cac27eca93ebddc0bb7edb62af9c5adfa7915ccca2ffe25adfe76e31a7835de'
@@ -309,7 +312,7 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
       safeTxHash,
     }
     const data = await dsafe.fetchLegacy('GET', getConfirmationRoute, payload, chainId)
-    console.log(data);
+    console.log(data)
   })
   it('Create new delegate', async () => {
     const addDelegateApiRoute = '/v1/delegates/'

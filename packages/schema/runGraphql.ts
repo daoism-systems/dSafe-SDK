@@ -27,14 +27,14 @@ async function runGraphql(): Promise<void> {
     throw Error('Invalid File Path')
   }
   const server = await serveEncodedDefinition({
-    ceramicURL: CERAMIC_NODE_URL ?? 'http://localhost:7007',
+    ceramicURL: CERAMIC_NODE_URL ?? 'http://0.0.0.0:7007',
     graphiql: true,
     path: process.env.FILE_PATH,
     did,
     port: parseInt(process.env.PORT_NUMBER),
   })
 
-  console.log(`Server started on http://localhost:${process.env.PORT_NUMBER}`)
+  console.log(`Server started on http://0.0.0.0:${process.env.PORT_NUMBER}`)
 
   process.on('SIGTERM', () => {
     server.stop().then(console.log).catch(console.error)

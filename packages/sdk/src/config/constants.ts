@@ -11,7 +11,7 @@ export const API_NETWORKS: SAFE_API_NETWORK = {
 }
 
 export const CERAMIC_NETWORKS: CeramicNetwork = {
-  local: 'http://localhost:7007',
+  local: 'http://0.0.0.0:7007',
   testnet: '',
   mainnet: '',
 }

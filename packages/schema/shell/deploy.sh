@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Default value for ceramicNodeUrl
-LOCAL_HOST_CERAMIC_NODE_URL="http://localhost:7007"
+LOCAL_HOST_CERAMIC_NODE_URL="http://0.0.0.0:7007"
 ceramicNodeUrl=$LOCAL_HOST_CERAMIC_NODE_URL
 
 # Function to show usage and exit
