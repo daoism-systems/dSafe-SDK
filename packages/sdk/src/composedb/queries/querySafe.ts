@@ -65,7 +65,10 @@ export const checkSafeExists = async (
 }
 
 // get safe
-export const getSafe = async (safeAddress: string, composeClient: ComposeClient): Promise<any> => {
+export const getSafe = async (
+  safeAddress: string,
+  composeClient: ComposeClient,
+): Promise<{ exists: boolean; safeData: any }> => {
   const executionResult = await composeClient.executeQuery(GET_SAFE_QUERY(safeAddress))
   if (executionResult?.data !== undefined && executionResult.data !== null) {
     const safeIndex: any = executionResult.data.safeIndex

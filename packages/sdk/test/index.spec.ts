@@ -2,7 +2,12 @@
 import dotenv from 'dotenv'
 import DSafe from '../src/index.js'
 import { describe, expect } from '@jest/globals'
-import { API_ENDPOINT, STATUS_CODE_200, STATUS_CODE_201, STATUS_CODE_202 } from '../src/config/constants.js'
+import {
+  API_ENDPOINT,
+  STATUS_CODE_200,
+  STATUS_CODE_201,
+  STATUS_CODE_202,
+} from '../src/config/constants.js'
 import { ERROR_CODE } from '../src/config/ERROR_CODES.js'
 import NETWORKS from '../src/config/networks.js'
 import Logger from '../src/utils/Logger.utils.js'
@@ -17,6 +22,7 @@ import { type GetDelegatesPayload } from '../src/types/GET_DELEGATES.type.js'
 import { hexValue } from 'ethers/lib/utils.js'
 import { SAFE_ADDRESS, TEST_ACCOUNT } from './secrets.js'
 import axios, { type AxiosRequestConfig } from 'axios'
+import { getSafe } from '../src/composedb/queries/querySafe.js'
 dotenv.config({ path: './.env' })
 const log = new Logger()
 // const expect = chai.expect
@@ -301,8 +307,9 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
     const payload: GetSafePayload = {
       address: safeAddress,
     }
-    const data = await dsafe.fetchLegacy('GET', getSafeRoute, payload, chainId)
-    console.log(data)
+    const apiResponse = await axios.request({ url: dsafe.generateApiUrl(getSafeRoute, chainId) })
+    const response = await dsafe.fetchLegacy('GET', getSafeRoute, payload, chainId)
+    expect(response.data).toMatchObject(apiResponse.data)
   })
   it('get all transactions', async () => {
     const safeAddress = SAFE_ADDRESS
