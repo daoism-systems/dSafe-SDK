@@ -2,10 +2,10 @@ import { CeramicClient } from '@ceramicnetwork/http-client'
 import { ComposeClient } from '@composedb/client'
 import { API_ENDPOINT, CERAMIC_NETWORKS } from '../config/constants.js'
 import Logger from '../utils/Logger.utils.js'
-import axios, { type AxiosResponse, type AxiosRequestConfig } from 'axios'
+// import axios, { type AxiosRequestConfig } from 'axios'
 import { throwError } from '../utils/error.utils.js'
 import { ERROR_CODE } from '../config/ERROR_CODES.js'
-import handleDSafeRequest from '../handlers/handler.js'
+import handleDSafeRequest, { type DSafeResponse } from '../handlers/handler.js'
 import { type CeramicNetwork } from '../types/SAFE_API_NETWORK.types.js'
 import { definition } from '../../__generated__/definitions.dev.js'
 import { type RuntimeCompositeDefinition } from '@composedb/types'
@@ -27,8 +27,7 @@ export default class DSafe {
     ceramicNetwork: keyof CeramicNetwork,
     ceramicNetworkOverride?: string,
   ) {
-    const ceramicNodeUrlToUse =
-      ceramicNetworkOverride ?? CERAMIC_NETWORKS[ceramicNetwork]
+    const ceramicNodeUrlToUse = ceramicNetworkOverride ?? CERAMIC_NETWORKS[ceramicNetwork]
     this.initialised = true
     this.network = network
     this.ceramicClient = new CeramicClient(ceramicNodeUrlToUse)
@@ -88,33 +87,36 @@ export default class DSafe {
     apiRoute: string,
     payload?: any,
     network?: string,
-  ): Promise<AxiosResponse> {
-    console.log('Fetching...')
-    const apiUrl = this.generateApiUrl(apiRoute, network)
-    const status = await handleDSafeRequest(
+  ): Promise<DSafeResponse> {
+    console.log('Fetching...', apiRoute)
+    // const apiUrl = this.generateApiUrl(apiRoute, network)
+    const response = await handleDSafeRequest(
       this.composeClient,
       httpMethod,
       apiRoute,
       payload,
       network,
     )
-    if (!status) {
+    console.log({ response })
+    if (response.status) {
+      return response
+    } else {
       log.error('DSafe request failed, execution stopped!', [])
-      throw Error('dSafe request failed')
-    }
-    log.info('Fetch route:', [apiUrl])
-    const options: AxiosRequestConfig = {}
-    options.method = httpMethod
-    options.url = apiUrl
-    if (payload?.apiData !== undefined) {
-      options.data = payload.apiData
-    }
-    try {
-      const result = await axios.request(options)
-      return result
-    } catch (e) {
-      console.log(e)
-      throw e
+      return response
+      // log.info('Fetch route:', [apiUrl])
+      // const options: AxiosRequestConfig = {}
+      // options.method = httpMethod
+      // options.url = apiUrl
+      // if (payload?.apiData !== undefined) {
+      //   options.data = payload.apiData
+      // }
+      // try {
+      //   const result = await axios.request(options)
+      //   return { status: true, data: result.data }
+      // } catch (e) {
+      //   console.log(e)
+      //   throw e
+      // }
     }
   }
 }

@@ -18,6 +18,10 @@ export const CERAMIC_NETWORKS: CeramicNetwork = {
 
 export const STATUS_CODE_200 = 200
 
+export const STATUS_CODE_201 = 201
+
+export const STATUS_CODE_202 = 202
+
 export const STATUS_CODE_400 = 400
 
 export const ZERO_ADDRESS_REFUND_RECEIVER = '0x0000000000000000000000000000000000000000'

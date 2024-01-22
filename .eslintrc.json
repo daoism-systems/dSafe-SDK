@@ -27,6 +27,7 @@
         "quotes": ["error", "single"],
         "no-duplicate-imports": "error",
         "no-unused-expressions": "off",
+        "no-unused-vars": "warn",
         "@typescript-eslint/no-unused-expressions": "warn",
         "@typescript-eslint/no-explicit-any": "warn",
         "@typescript-eslint/strict-boolean-expressions": "warn"
