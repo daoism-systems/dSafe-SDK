@@ -2,7 +2,7 @@
 import dotenv from 'dotenv'
 import DSafe from '../src/index.js'
 import { describe, expect } from '@jest/globals'
-import { API_ENDPOINT, STATUS_CODE_200, STATUS_CODE_400 } from '../src/config/constants.js'
+import { API_ENDPOINT, STATUS_CODE_200, STATUS_CODE_201, STATUS_CODE_202 } from '../src/config/constants.js'
 import { ERROR_CODE } from '../src/config/ERROR_CODES.js'
 import NETWORKS from '../src/config/networks.js'
 import Logger from '../src/utils/Logger.utils.js'
@@ -15,6 +15,8 @@ import { type GetTransactionConfirmationsPayload } from '../src/types/GET_TRANSA
 import { type UpdateDelegatePayload } from '../src/types/CREATE_DELEGATE.type.js'
 import { type GetDelegatesPayload } from '../src/types/GET_DELEGATES.type.js'
 import { hexValue } from 'ethers/lib/utils.js'
+import { SAFE_ADDRESS, TEST_ACCOUNT } from './secrets.js'
+import axios, { type AxiosRequestConfig } from 'axios'
 dotenv.config({ path: './.env' })
 const log = new Logger()
 // const expect = chai.expect
@@ -28,8 +30,8 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
   const ceramicNodeNetwork = 'local'
   const demoApiRouteWithoutSlash: string = 'sendTransactions'
   const demoApiRouteWithSlash: string = '/sendTransactions'
-  const testAccountOnGoerli = '0x9cA70B93CaE5576645F5F069524A9B9c3aef5006'
-  const testSafeOnGoerli = '0xa192aBe4667FC4d11e46385902309cd7421997ed'
+  const testAccountOnGoerli = TEST_ACCOUNT
+  const testSafeOnGoerli = SAFE_ADDRESS
   const delegateAddress = '0xADC81e65845cEca5B928fdd484A38B98E5f418B0'
   const testUsdt = '0xC11F33798F500bE942Ff2CA122790c2dc7c087E1'
   const totalSupplyAbi = [
@@ -95,13 +97,18 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
   }, 100000)
   it('should fetch all the safes of an owner', async () => {
     const apiRoute = `/v1/owners/${testAccountOnGoerli}/safes`
+    const options: AxiosRequestConfig = {}
+    options.method = 'GET'
+    options.url = dsafe.generateApiUrl(apiRoute)
+    const expectedResult = await axios.request(options)
     const result = await dsafe.fetchLegacy('GET', apiRoute)
-    log.info('Data returned from API:', [result.data])
-    expect(result.status).toBe(STATUS_CODE_200)
+    log.info('Data returned from :', [result.data?.safes, expectedResult.data?.safes])
+    expect(result.data?.safes).toStrictEqual(expectedResult.data?.safes)
   }, 10000)
   it('should post a new delegate to the safe', async () => {
     // add delegate
-    const apiRoute = 'v1/delegates/' // add trailing forward slash to prevent server from doing GET
+    const apiRoute = '/v1/delegates/' // add trailing forward slash to prevent server from doing GET
+    console.log({ PRIVATE_KEY })
 
     if (PRIVATE_KEY !== undefined) {
       // generate signature to add delegate
@@ -123,8 +130,12 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
           label: 'delegator',
         },
       }
-      const postResult = await dsafe.fetchLegacy('POST', apiRoute, payload)
-      expect(postResult.status).not.toBe(STATUS_CODE_400)
+      console.log({ apiRoute, payload })
+
+      const postResult = await dsafe.fetchLegacy('POST', apiRoute, payload, chainId)
+      console.log({ postResult })
+
+      expect(postResult.status).toBe(STATUS_CODE_202)
     }
 
     // get delegate
@@ -147,7 +158,7 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
     expect(result.data?.parameters[0].value).toBe(testAccountOnGoerli)
   })
   it('should be able to create new transaction', async () => {
-    const safeAddress = '0xa192aBe4667FC4d11e46385902309cd7421997ed'
+    const safeAddress = SAFE_ADDRESS
     const createTransactionRoute = `/v1/safes/${safeAddress}/multisig-transactions/`
 
     const safeAbi = getSafeSingletonDeployment()?.abi
@@ -166,7 +177,10 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
       refundReceiver: '0x0000000000000000000000000000000000000000',
       nonce: 13,
     }
-    const provider = ethers.getDefaultProvider(chainId)
+    const provider = new ethers.providers.AlchemyProvider(
+      NETWORKS.GOERLI,
+      process.env.ALCHEMY_API_KEY,
+    )
     // const signer = new ethers.BaseWallet(new ethers.SigningKey(PRIVATE_KEY as string), provider)
     const signer = new ethers.Wallet(PRIVATE_KEY as string, provider)
     const safeInstance = new ethers.Contract(safeAddress, safeAbi, signer)
@@ -214,10 +228,13 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
         signature,
       },
     }
-    await dsafe.fetchLegacy('POST', createTransactionRoute, payload, chainId)
+    const dsafeResponse = await dsafe.fetchLegacy('POST', createTransactionRoute, payload, chainId)
+    console.log({ dsafeResponse })
+
+    expect(dsafeResponse.data).toBe(STATUS_CODE_201)
   }, 100000)
   it('should be able to add new confirmation to existing transaction', async () => {
-    const safeAddress = '0xa192aBe4667FC4d11e46385902309cd7421997ed'
+    const safeAddress = SAFE_ADDRESS
 
     const safeAbi = getSafeSingletonDeployment()?.abi
     if (safeAbi === undefined) {
@@ -236,7 +253,7 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
       nonce: 13,
     }
     console.log('This is working')
-    const provider = ethers.getDefaultProvider(chainId)
+    const provider = new ethers.providers.AlchemyProvider(chainId, process.env.ALCHEMY_API_KEY)
     console.log('This is working')
     // const signer = new ethers.BaseWallet(new ethers.SigningKey(PRIVATE_KEY as string), provider)
     const signer = new ethers.Wallet(PRIVATE_KEY as string, provider)
@@ -279,7 +296,7 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
     console.log(result)
   }, 100000)
   it('get safe data', async () => {
-    const safeAddress = '0xa192aBe4667FC4d11e46385902309cd7421997ed'
+    const safeAddress = SAFE_ADDRESS
     const getSafeRoute = `/v1/safes/${safeAddress}/`
     const payload: GetSafePayload = {
       address: safeAddress,
@@ -288,7 +305,7 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
     console.log(data)
   })
   it('get all transactions', async () => {
-    const safeAddress = '0xa192aBe4667FC4d11e46385902309cd7421997ed'
+    const safeAddress = SAFE_ADDRESS
     const getTransactionsRoute = `/v1/safes/${safeAddress}/multisig-transactions/`
     const payload: GetAllTransactionsPayload = {
       address: safeAddress,
