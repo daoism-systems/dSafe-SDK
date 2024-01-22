@@ -14,7 +14,15 @@ query GetSigner {
 `
 
 // Using the query in a component
-export const checkSignerExists = async (signer: string, composeClient: ComposeClient): Promise<any> => {
+
+interface ResponseProps {
+  exists: boolean
+  id?: string
+}
+export const checkSignerExists = async (
+  signer: string,
+  composeClient: ComposeClient,
+): Promise<ResponseProps> => {
   const executionResult = await composeClient.executeQuery(CHECK_SIGNER_EXISTS_QUERY(signer))
   console.log(executionResult)
   if (executionResult?.data !== undefined && executionResult.data !== null) {
