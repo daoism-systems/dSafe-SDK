@@ -7,6 +7,8 @@ import axios from 'axios'
 import {
   API_ENDPOINT,
   EMPTY_TRANSACTION_DATA,
+  STATUS_CODE_201,
+  STATUS_CODE_400,
   ZERO_ADDRESS_GAS_TOKEN,
   ZERO_ADDRESS_REFUND_RECEIVER,
 } from '../config/constants.js'
@@ -15,15 +17,16 @@ import { composeTransaction } from '../composedb/mutations/mutateTransaction.js'
 import { checkTransactionExists } from '../composedb/queries/queryTransaction.js'
 import { composeConfirmation } from '../composedb/mutations/mutateConfirmation.js'
 import { checkConfirmationExists } from '../composedb/queries/queryConfirmation.js'
-import type RouteHandler from '../types/ROUTE_HANDLER.type.js'
 import { composeSignerSafe } from '../composedb/mutations/mutateSignerSafe.js'
 import { checkSignerSafeExists } from '../composedb/queries/querySignerSafe.js'
+import { type DSafeResponse } from './handler.js'
+import type RouteHandler from '../types/ROUTE_HANDLER.type.js'
 
 const handleCreateTransaction: RouteHandler<CreateTransactionPayload> = async (
   composeClient: ComposeClient,
   payload?: CreateTransactionPayload,
   network?: string,
-) => {
+): Promise<DSafeResponse> => {
   // check if safe exists, if not, create safe
   if (payload === undefined) {
     throw Error('Payload cannot be undefined for Create Transaction')
@@ -54,9 +57,11 @@ const handleCreateTransaction: RouteHandler<CreateTransactionPayload> = async (
   const deployedBlockNumber = 10
 
   // todo: find caip network ID for network string
-  const networkId = 'eip155:1'
+  const networkId = 'eip155:5'
 
   const data = response.data
+  console.log({ data: JSON.stringify(response.data) })
+
   if (!safeExist.exists) {
     console.log('Composing Safe')
     const input = {
@@ -84,8 +89,8 @@ const handleCreateTransaction: RouteHandler<CreateTransactionPayload> = async (
   const signerExist = await checkSignerExists(payload.sender, composeClient)
   let signerStreamId: string | undefined = signerExist.id
   let signerSafeStreamId: string | undefined
-  if (!signerExist.exists && (data.owners.includes(payload.sender) === true)) {
-    console.log('Sender is signer but isn\'t Signer entity isn\'t created for the sender')
+  if (!signerExist.exists && data.owners.includes(payload.sender) === true) {
+    console.log('Sender is signer but is not Signer entity is not created for the sender')
     const input = {
       content: {
         signer: payload.sender,
@@ -114,7 +119,7 @@ const handleCreateTransaction: RouteHandler<CreateTransactionPayload> = async (
     )
     console.log(`Signer Safe relationship: ${signerSafeRelationshipCreated.exists}`)
     signerSafeStreamId = signerSafeRelationshipCreated.id
-    console.log(`Signer Safe Relationship Stream ID: ${signerSafeStreamId}`);
+    console.log(`Signer Safe Relationship Stream ID: ${signerSafeStreamId}`)
   }
 
   console.log(safeStreamId, signerStreamId)
@@ -129,8 +134,7 @@ const handleCreateTransaction: RouteHandler<CreateTransactionPayload> = async (
       gasPrice: payload.gasPrice,
       safeTxGas: payload.safeTxGas,
       value: payload.value,
-      refundReceiver:
-        payload.refundReceiver ?? ZERO_ADDRESS_REFUND_RECEIVER,
+      refundReceiver: payload.refundReceiver ?? ZERO_ADDRESS_REFUND_RECEIVER,
       data: payload.data ?? EMPTY_TRANSACTION_DATA,
       operation: payload.operation,
       gasToken: payload.gasToken ?? ZERO_ADDRESS_GAS_TOKEN,
@@ -166,18 +170,23 @@ const handleCreateTransaction: RouteHandler<CreateTransactionPayload> = async (
     await composeConfirmation(confirmationInput, composeClient)
     const confirmationCreated = await checkConfirmationExists(
       confirmationInput.content.signerID as string,
-      confirmationInput.content.transactionId,
+      `${confirmationInput.content.transactionId}`,
       composeClient,
     )
     console.log(`Confirmation Created: ${confirmationCreated.exists}`)
+
+    return { status: true, data: STATUS_CODE_201 }
   } else {
+    return { status: false, data: STATUS_CODE_201 }
+    // throwError('Transaction already exists!')
+    // return { status: false, data: null }
     // todo:
     // await updateTransaction(input, composeClient);
     // update transaction and add confirmation of sender
     // and remove all other confirmations because the transaction has been updated
     // const confirmationExists = await checkConfirmationExists()
   }
-  return true
+  return { status: false, data: STATUS_CODE_400 }
 }
 
 export default handleCreateTransaction

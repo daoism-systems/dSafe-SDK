@@ -21,12 +21,16 @@ const handleGetAllTransactions: RouteHandler<GetAllTransactionsPayload> = async 
   // get safe ID
   const safeExists = await checkSafeExists(payload?.address, composeClient)
   if (!safeExists.exists) {
-    throw Error('Safe doesn\'t exists')
+    throw Error('Safe does not exists')
   }
   const safeId = safeExists.id
   // get transactions where safe ID
-  const transactionExists = await getAllTransactions(safeId, networkId as string, composeClient)
-  console.log(transactionExists.transactionData)
+  const transactionExists = await getAllTransactions(
+    `${safeId}`,
+    networkId as string,
+    composeClient,
+  )
+  console.log(transactionExists.data.transactionData)
   return transactionExists.exists
 }
 

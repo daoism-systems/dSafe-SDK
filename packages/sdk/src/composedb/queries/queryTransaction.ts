@@ -145,7 +145,7 @@ export const checkTransactionExists = async (
   nonce: number,
   safeId: string,
   composeClient: ComposeClient,
-): Promise<any> => {
+): Promise<{ exists: boolean; id?: string }> => {
   const executionResult = await composeClient.executeQuery(CHECK_TRANSACTION_EXIST(nonce, safeId))
   if (executionResult?.data !== undefined && executionResult.data !== null) {
     const transactionIndex: any = executionResult.data.transactionIndex
@@ -164,7 +164,7 @@ export const getAllTransactions = async (
   safeId: string,
   networkId: string,
   composeClient: ComposeClient,
-): Promise<any> => {
+): Promise<{ exists: boolean; data?: any }> => {
   const executionResult = await composeClient.executeQuery(
     GET_TRANSACTIONS_OF_SAFE(safeId, networkId),
   )
@@ -175,17 +175,17 @@ export const getAllTransactions = async (
       const returnData = { exists: true, transactionData: transactionIndex.edges[0].node }
       return returnData
     } else {
-      return { exists: false, transactionData: undefined }
+      return { exists: false, data: undefined }
     }
   }
-  return { exists: false, transactionData: undefined }
+  return { exists: false, data: undefined }
 }
 
 export const getTransaction = async (
   safeTxHash: string,
   networkId: string,
   composeClient: ComposeClient,
-): Promise<any> => {
+): Promise<{ exists: boolean; id?: string }> => {
   console.log(safeTxHash, networkId)
   const executionResult = await composeClient.executeQuery(GET_TRANSACTION(safeTxHash, networkId))
   console.log(executionResult)
@@ -193,13 +193,13 @@ export const getTransaction = async (
     const transactionIndex: any = executionResult.data.transactionIndex
     if (transactionIndex.edges.length !== 0) {
       console.log('Transaction exists')
-      const returnData = { exists: true, transactionData: transactionIndex.edges[0].node }
+      const returnData = { exists: true, id: transactionIndex.edges[0].node }
       return returnData
     } else {
-      console.log('Transaction doesn\'t exist')
-      return { exists: false, transactionData: undefined }
+      console.log('Transaction does not exist')
+      return { exists: false, id: undefined }
     }
   }
   console.log('Error while fetching data from ceramic')
-  return { exists: false, transactionData: undefined }
+  return { exists: false, id: undefined }
 }
