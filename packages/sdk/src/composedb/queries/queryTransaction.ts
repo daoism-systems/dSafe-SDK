@@ -168,6 +168,7 @@ export const getAllTransactions = async (
   const executionResult = await composeClient.executeQuery(
     GET_TRANSACTIONS_OF_SAFE(safeId, networkId),
   )
+  console.log({ executionResult: JSON.stringify(executionResult) })
   if (executionResult?.data !== undefined && executionResult.data !== null) {
     const transactionIndex: any = executionResult.data.transactionIndex
     if (transactionIndex.edges.length !== 0) {

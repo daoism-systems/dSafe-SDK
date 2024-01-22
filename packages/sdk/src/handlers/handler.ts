@@ -44,14 +44,14 @@ export default async function handleDSafeRequest(
   apiRoute: string,
   payload?: unknown,
   network?: string,
-): Promise<DSafeResponse> {
+): Promise<any> {
   console.log('Handling:', httpMethod, apiRoute)
   const apiRouteWithRequestType = `${httpMethod} ${apiRoute}`
   for (const pattern in routeHandlers) {
     if (new RegExp(pattern).test(apiRouteWithRequestType)) {
       console.log(`Implementing route: ${apiRouteWithRequestType}`)
       const response = await routeHandlers[pattern](composeClient, payload, network)
-      return { status: true, data: response }
+      return response
     }
   }
   console.log(`No handler found for route: ${apiRouteWithRequestType}`)

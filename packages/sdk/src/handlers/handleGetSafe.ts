@@ -14,7 +14,7 @@ const handleGetSafe: RouteHandler<GetSafePayload> = async (
   }
   const getSafeResponse = await getSafe(payload?.address, composeClient)
   console.log(getSafeResponse)
-  return getSafeResponse.safeData
+  return { status: true, data: getSafeResponse.safeData }
 }
 
 export default handleGetSafe

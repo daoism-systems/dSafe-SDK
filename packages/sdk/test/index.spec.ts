@@ -309,6 +309,9 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
     }
     const apiResponse = await axios.request({ url: dsafe.generateApiUrl(getSafeRoute, chainId) })
     const response = await dsafe.fetchLegacy('GET', getSafeRoute, payload, chainId)
+
+    console.log({ apiResponse, response })
+
     expect(response.data).toMatchObject(apiResponse.data)
   })
   it('get all transactions', async () => {
@@ -317,8 +320,14 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
     const payload: GetAllTransactionsPayload = {
       address: safeAddress,
     }
-    const data = await dsafe.fetchLegacy('GET', getTransactionsRoute, payload, chainId)
-    console.log(data)
+    const apiResponse = await axios.request({
+      url: dsafe.generateApiUrl(getTransactionsRoute, chainId),
+    })
+
+    const response = await dsafe.fetchLegacy('GET', getTransactionsRoute, payload, chainId)
+    console.log({ apiResponse: apiResponse.data, response })
+    expect(response.status).toBe(true)
+    expect(response.data).toMatchObject(apiResponse.data)
   })
   it('Get a transaction using safeTxHash', async () => {
     const safeTxHash = '0x8cac27eca93ebddc0bb7edb62af9c5adfa7915ccca2ffe25adfe76e31a7835de'

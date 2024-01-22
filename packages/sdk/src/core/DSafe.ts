@@ -99,6 +99,7 @@ export default class DSafe {
     )
     console.log({ response })
     if (response.status) {
+
       return response
     } else {
       log.error('DSafe request failed, execution stopped!', [])

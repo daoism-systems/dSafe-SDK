@@ -25,13 +25,17 @@ const handleGetAllTransactions: RouteHandler<GetAllTransactionsPayload> = async 
   }
   const safeId = safeExists.id
   // get transactions where safe ID
-  const transactionExists = await getAllTransactions(
-    `${safeId}`,
-    networkId as string,
-    composeClient,
-  )
-  console.log(transactionExists.data.transactionData)
-  return transactionExists.exists
+  const transactions = await getAllTransactions(`${safeId}`, networkId as string, composeClient)
+
+  const responseData = {
+    count: transactions?.data?.length ?? 0,
+    next: null,
+    previous: null,
+    countUniqueNonce: 0,
+    results: transactions.data ?? [],
+  }
+  console.log({ response: responseData })
+  return { status: true, data: responseData }
 }
 
 export default handleGetAllTransactions
