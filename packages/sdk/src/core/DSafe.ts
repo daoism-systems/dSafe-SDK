@@ -100,29 +100,30 @@ export default class DSafe {
     )
     console.log({ response })
 
-    const apiUrl = this.generateApiUrl(apiRoute, network)
-    log.error('DSafe request failed, execution stopped!', [])
-    log.info('Fetch route:', [apiRoute])
-    const options: AxiosRequestConfig = {}
-    options.method = httpMethod
-    options.url = apiUrl
-    if (payload?.apiData !== undefined) {
-      options.data = payload.apiData
-    }
-    try {
-      const result = await axios.request(options)
-      console.log({ result })
-
-      return { status: true, data: result.data }
-    } catch (e: any) {
-      console.error({
-        error: {
-          status: e.status,
-          message: e.message,
-          data: JSON.stringify(e.response.data),
-        },
-      })
-      throw e
+    if (!response.status) {
+      const apiUrl = this.generateApiUrl(apiRoute, network)
+      log.error('DSafe request failed, execution stopped!', [])
+      log.info('Fetch route:', [apiRoute])
+      const options: AxiosRequestConfig = {}
+      options.method = httpMethod
+      options.url = apiUrl
+      if (payload?.apiData !== undefined) {
+        options.data = payload.apiData
+      }
+      try {
+        const result = await axios.request(options)
+        console.log({ result })
+        return { status: true, data: result.data }
+      } catch (e: any) {
+        console.error({
+          error: {
+            status: e.status,
+            message: e.message,
+            data: JSON.stringify(e.response.data),
+          },
+        })
+        return e
+      }
     }
     return response
   }

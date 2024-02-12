@@ -71,101 +71,101 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
     signer = new ethers.Wallet(PRIVATE_KEY as string)
     await dsafe.initializeDIDOnNode(PRIVATE_KEY as string)
   })
-  // it('DSafe instance is initialised with correct chain ID', () => {
-  //   expect(dsafe.ceramicClient).toBeDefined()
-  //   expect(dsafe.composeClient).toBeDefined()
-  //   expect(dsafe.initialised).toBe(true)
-  // })
-  // it('Dsafe fails when private key is empty', async () => {
-  //   const newDsafe = new DSafe(chainId, ceramicNodeNetwork)
-  //   await expect(newDsafe.initializeDIDOnNode('')).rejects.toThrow('Private Key empty!')
-  // })
-  // it('Dsafe safely generates DID on Node', async () => {
-  //   const newDsafe = new DSafe(chainId, ceramicNodeNetwork)
-  //   expect(newDsafe.did).toBeUndefined()
-  //   expect(newDsafe.composeClient.did).toBeUndefined()
-  //   await newDsafe.initializeDIDOnNode(PRIVATE_KEY as string)
-  //   expect(newDsafe.composeClient.did).toBeDefined()
-  //   expect(newDsafe.did).toBeDefined()
-  // })
-  // it('Should generate correct API URL', () => {
-  //   expect(dsafe.generateApiUrl(demoApiRouteWithoutSlash)).toBe(
-  //     `${API_ENDPOINT(chainId)}/${demoApiRouteWithoutSlash}`,
-  //   )
-  //   expect(dsafe.generateApiUrl(demoApiRouteWithSlash)).toBe(
-  //     `${API_ENDPOINT(chainId)}${demoApiRouteWithSlash}`,
-  //   )
-  // })
-  // it('Should throw error if api route is empty string', () => {
-  //   const wrappedFunction = (): string => dsafe.generateApiUrl(emptyApi)
-  //   expect(wrappedFunction).toThrow(ERROR_CODE.API_ROUTE_PROVIDED_EMPTY)
-  // })
-  // it('Should get about the API', async () => {
-  //   const result = await dsafe.fetchLegacy('GET', 'v1/about')
-  //   expect(result.status).toBe(STATUS_CODE_200)
-  // }, 100000)
-  // it('should fetch all the safes of an owner', async () => {
-  //   const apiRoute = `/v1/owners/${testAccountOnSepolia}/safes`
-  //   const options: AxiosRequestConfig = {}
-  //   options.method = 'GET'
-  //   options.url = dsafe.generateApiUrl(apiRoute)
-  //   const expectedResult = await axios.request(options)
-  //   const result = await dsafe.fetchLegacy('GET', apiRoute)
-  //   log.info('Data returned from :', [result.data?.safes, expectedResult.data?.safes])
-  //   expect(result.data?.safes).toStrictEqual(expectedResult.data?.safes)
-  // }, 10000)
-  // it('should post a new delegate to the safe', async () => {
-  //   // add delegate
-  //   const apiRoute = '/v1/delegates/' // add trailing forward slash to prevent server from doing GET
-  //   console.log({ PRIVATE_KEY })
+  it('DSafe instance is initialised with correct chain ID', () => {
+    expect(dsafe.ceramicClient).toBeDefined()
+    expect(dsafe.composeClient).toBeDefined()
+    expect(dsafe.initialised).toBe(true)
+  })
+  it('Dsafe fails when private key is empty', async () => {
+    const newDsafe = new DSafe(chainId, ceramicNodeNetwork)
+    await expect(newDsafe.initializeDIDOnNode('')).rejects.toThrow('Private Key empty!')
+  })
+  it('Dsafe safely generates DID on Node', async () => {
+    const newDsafe = new DSafe(chainId, ceramicNodeNetwork)
+    expect(newDsafe.did).toBeUndefined()
+    expect(newDsafe.composeClient.did).toBeUndefined()
+    await newDsafe.initializeDIDOnNode(PRIVATE_KEY as string)
+    expect(newDsafe.composeClient.did).toBeDefined()
+    expect(newDsafe.did).toBeDefined()
+  })
+  it('Should generate correct API URL', () => {
+    expect(dsafe.generateApiUrl(demoApiRouteWithoutSlash)).toBe(
+      `${API_ENDPOINT(chainId)}/${demoApiRouteWithoutSlash}`,
+    )
+    expect(dsafe.generateApiUrl(demoApiRouteWithSlash)).toBe(
+      `${API_ENDPOINT(chainId)}${demoApiRouteWithSlash}`,
+    )
+  })
+  it('Should throw error if api route is empty string', () => {
+    const wrappedFunction = (): string => dsafe.generateApiUrl(emptyApi)
+    expect(wrappedFunction).toThrow(ERROR_CODE.API_ROUTE_PROVIDED_EMPTY)
+  })
+  it('Should get about the API', async () => {
+    const result = await dsafe.fetchLegacy('GET', 'v1/about')
+    expect(result.status).toBe(STATUS_CODE_200)
+  }, 100000)
+  it('should fetch all the safes of an owner', async () => {
+    const apiRoute = `/v1/owners/${testAccountOnSepolia}/safes`
+    const options: AxiosRequestConfig = {}
+    options.method = 'GET'
+    options.url = dsafe.generateApiUrl(apiRoute)
+    const expectedResult = await axios.request(options)
+    const result = await dsafe.fetchLegacy('GET', apiRoute)
+    log.info('Data returned from :', [result.data?.safes, expectedResult.data?.safes])
+    expect(result.data?.safes).toStrictEqual(expectedResult.data?.safes)
+  }, 10000)
+  it('should post a new delegate to the safe', async () => {
+    // add delegate
+    const apiRoute = '/v1/delegates/' // add trailing forward slash to prevent server from doing GET
+    console.log({ PRIVATE_KEY })
 
-  //   if (PRIVATE_KEY !== undefined) {
-  //     // generate signature to add delegate
-  //     const TOTP = Math.floor(Math.floor(Date.now() / 1000) / 3600)
-  //     const messageToSign = `${delegateAddress}${TOTP.toString()}`
-  //     if (PRIVATE_KEY === undefined) {
-  //       throw Error('Private key invalid')
-  //     }
-  //     const wallet = new ethers.Wallet(PRIVATE_KEY)
-  //     const signature = await wallet.signMessage(messageToSign)
+    if (PRIVATE_KEY !== undefined) {
+      // generate signature to add delegate
+      const TOTP = Math.floor(Math.floor(Date.now() / 1000) / 3600)
+      const messageToSign = `${delegateAddress}${TOTP.toString()}`
+      if (PRIVATE_KEY === undefined) {
+        throw Error('Private key invalid')
+      }
+      const wallet = new ethers.Wallet(PRIVATE_KEY)
+      const signature = await wallet.signMessage(messageToSign)
 
-  //     // send POST request
-  //     const payload = {
-  //       apiData: {
-  //         safe: testSafeOnSepolia,
-  //         delegate: delegateAddress,
-  //         delegator: testAccountOnSepolia,
-  //         signature,
-  //         label: 'delegator',
-  //       },
-  //     }
-  //     console.log({ apiRoute, payload })
+      // send POST request
+      const payload = {
+        apiData: {
+          safe: testSafeOnSepolia,
+          delegate: delegateAddress,
+          delegator: testAccountOnSepolia,
+          signature,
+          label: 'delegator',
+        },
+      }
+      console.log({ apiRoute, payload })
 
-  //     const postResult = await dsafe.fetchLegacy('POST', apiRoute, payload, chainId)
-  //     console.log({ postResult })
+      const postResult = await dsafe.fetchLegacy('POST', apiRoute, payload, chainId)
+      console.log({ postResult })
 
-  //     expect(postResult.status).toBe(STATUS_CODE_202)
-  //   }
+      expect(postResult.status).toBe(STATUS_CODE_202)
+    }
 
-  //   // get delegate
-  //   const delegates = await dsafe.fetchLegacy('GET', `${apiRoute}?safe=${testSafeOnSepolia}`)
-  //   const delegateExist: number = delegates.data.results.findIndex(
-  //     (element: any) => element.delegate === delegateAddress,
-  //   )
-  //   expect(delegates.data.results[delegateExist].delegate).toBe(delegateAddress)
-  // }, 100000)
-  // it('should use dSafe registry for Data decoder', async () => {
-  //   const decodeDataroute = '/v1/data-decoder/'
-  //   const usdt = new ethers.Contract(testUsdt, totalSupplyAbi)
-  //   const encodedData = usdt.interface.encodeFunctionData('balanceOf', [testAccountOnSepolia])
-  //   const payload = {
-  //     apiData: {
-  //       data: encodedData,
-  //     },
-  //   }
-  //   const result = await dsafe.fetchLegacy('POST', decodeDataroute, payload)
-  //   expect(result.data?.parameters[0].value).toBe(testAccountOnSepolia)
-  // })
+    // get delegate
+    const delegates = await dsafe.fetchLegacy('GET', `${apiRoute}?safe=${testSafeOnSepolia}`)
+    const delegateExist: number = delegates.data.results.findIndex(
+      (element: any) => element.delegate === delegateAddress,
+    )
+    expect(delegates.data.results[delegateExist].delegate).toBe(delegateAddress)
+  }, 100000)
+  it('should use dSafe registry for Data decoder', async () => {
+    const decodeDataroute = '/v1/data-decoder/'
+    const usdt = new ethers.Contract(testUsdt, totalSupplyAbi)
+    const encodedData = usdt.interface.encodeFunctionData('balanceOf', [testAccountOnSepolia])
+    const payload = {
+      apiData: {
+        data: encodedData,
+      },
+    }
+    const result = await dsafe.fetchLegacy('POST', decodeDataroute, payload)
+    expect(result.data?.parameters[0].value).toBe(testAccountOnSepolia)
+  })
   it('should be able to create new transaction', async () => {
     const safeAddress = SAFE_ADDRESS
     const createTransactionRoute = `/v1/safes/${safeAddress}/multisig-transactions/`
