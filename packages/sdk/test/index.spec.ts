@@ -19,7 +19,7 @@ import { type GetTransactionPayload } from '../src/types/GET_TRANSACTION_PAYLOAD
 import { type GetTransactionConfirmationsPayload } from '../src/types/GET_TRANSACTION_CONFIRMATIONS_PAYLOAD.type.js'
 import { type UpdateDelegatePayload } from '../src/types/CREATE_DELEGATE.type.js'
 import { type GetDelegatesPayload } from '../src/types/GET_DELEGATES.type.js'
-import { hexValue } from 'ethers/lib/utils.js'
+import { arrayify, hexValue } from 'ethers/lib/utils.js'
 import { SAFE_ADDRESS, TEST_ACCOUNT } from './secrets.js'
 import axios, { type AxiosRequestConfig } from 'axios'
 
@@ -206,7 +206,7 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
     )
     console.log({ safeTrxHash })
 
-    const signature = (await signer.signMessage(safeTrxHash))
+    const signature = (await signer.signMessage(arrayify(safeTrxHash)))
       .replace(/1b$/, '1f')
       .replace(/1c$/, '20')
 
@@ -217,7 +217,7 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
     const signerAddress = await signer.getAddress()
     const payload = {
       safe: safeAddress,
-      sender: signer,
+      sender: signer.address,
       contractTransactionHash: safeTrxHash,
       to: trxInput.to,
       data: trxInput.data,
