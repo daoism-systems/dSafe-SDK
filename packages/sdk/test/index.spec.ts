@@ -263,7 +263,7 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
     const dsafeResponse = await dsafe.fetchLegacy('POST', createTransactionRoute, payload, chainId)
     console.log({ dsafeResponse })
 
-    expect(dsafeResponse.data.data).toBe(STATUS_CODE_201)
+    expect(dsafeResponse.status).toBe(true)
   }, 100000)
   // it('should be able to add new confirmation to existing transaction', async () => {
   //   const safeAddress = SAFE_ADDRESS
