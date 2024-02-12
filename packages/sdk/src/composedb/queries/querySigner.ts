@@ -27,9 +27,9 @@ export const checkSignerExists = async (
   console.log(executionResult)
   if (executionResult?.data !== undefined && executionResult.data !== null) {
     const signerIndex: any = executionResult.data.signerIndex
-    if (signerIndex.edges.length !== 0) {
+    if (signerIndex?.edges.length !== 0) {
       console.log('signer exists')
-      const returnData = { exists: true, id: signerIndex.edges[0].node.id }
+      const returnData = { exists: true, id: signerIndex?.edges[0].node.id }
       return returnData
     } else {
       return { exists: false, id: undefined }

@@ -16,7 +16,7 @@
     "publish": "bash shell/publish.sh",
     "publish:npm": "yarn npm publish --access public",
     "test": "node --experimental-vm-modules ../../node_modules/jest/bin/jest.js",
-    "coverage": "c8 --all  yarn test",
+    "coverage": "c8 --all --reporter html yarn test",
     "tsnode": "ts-node --esm"
   },
   "engines": {

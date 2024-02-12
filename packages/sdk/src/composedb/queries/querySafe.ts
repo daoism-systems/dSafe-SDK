@@ -53,9 +53,9 @@ export const checkSafeExists = async (
   const executionResult = await composeClient.executeQuery(CHECK_SAFE_EXISTS_QUERY(safeAddress))
   if (executionResult?.data !== undefined && executionResult.data !== null) {
     const safeIndex: any = executionResult.data.safeIndex
-    if (safeIndex.edges.length !== 0) {
+    if (safeIndex?.edges?.length !== 0) {
       console.log('safe exists')
-      const returnData = { exists: true, id: safeIndex.edges[0].node.id }
+      const returnData = { exists: true, id: safeIndex?.edges?.[0].node.id }
       return returnData
     } else {
       return { exists: false, id: undefined }

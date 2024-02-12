@@ -57,7 +57,7 @@ const handleCreateTransaction: RouteHandler<CreateTransactionPayload> = async (
   const deployedBlockNumber = 10
 
   // todo: find caip network ID for network string
-  const networkId = 'eip155:5'
+  const networkId = 'eip155:1'
 
   const data = response.data
   console.log({ data: JSON.stringify(response.data) })

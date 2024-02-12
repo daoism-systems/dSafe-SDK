@@ -149,9 +149,9 @@ export const checkTransactionExists = async (
   const executionResult = await composeClient.executeQuery(CHECK_TRANSACTION_EXIST(nonce, safeId))
   if (executionResult?.data !== undefined && executionResult.data !== null) {
     const transactionIndex: any = executionResult.data.transactionIndex
-    if (transactionIndex.edges.length !== 0) {
+    if (transactionIndex?.edges.length !== 0) {
       console.log('Transaction exists')
-      const returnData = { exists: true, id: transactionIndex.edges[0].node.id }
+      const returnData = { exists: true, id: transactionIndex?.edges[0].node.id }
       return returnData
     } else {
       return { exists: false, id: undefined }

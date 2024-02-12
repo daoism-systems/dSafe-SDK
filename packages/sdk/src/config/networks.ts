@@ -1,6 +1,6 @@
 const NETWORKS = {
   MAINNET: 'mainnet',
-  GOERLI: 'goerli',
+  SEPOLIA: 'sepolia',
   OP: 'optimism',
 }
 

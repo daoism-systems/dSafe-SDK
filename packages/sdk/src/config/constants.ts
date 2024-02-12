@@ -6,8 +6,8 @@ export const API_ENDPOINT = (network: string): string =>
 
 export const API_NETWORKS: SAFE_API_NETWORK = {
   mainnet: 'mainnet',
-  goerli: 'goerli',
   optimism: 'optimism',
+  sepolia: 'sepolia',
 }
 
 export const CERAMIC_NETWORKS: CeramicNetwork = {

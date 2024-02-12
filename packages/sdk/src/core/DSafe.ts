@@ -13,6 +13,7 @@ import { fromString } from 'uint8arrays'
 import { DID } from 'dids'
 import { getResolver } from 'key-did-resolver'
 import { Ed25519Provider } from 'key-did-provider-ed25519'
+import axios, { type AxiosRequestConfig } from 'axios'
 const log = new Logger()
 
 export default class DSafe {
@@ -98,26 +99,31 @@ export default class DSafe {
       network,
     )
     console.log({ response })
-    if (response.status) {
 
-      return response
-    } else {
-      log.error('DSafe request failed, execution stopped!', [])
-      return response
-      // log.info('Fetch route:', [apiUrl])
-      // const options: AxiosRequestConfig = {}
-      // options.method = httpMethod
-      // options.url = apiUrl
-      // if (payload?.apiData !== undefined) {
-      //   options.data = payload.apiData
-      // }
-      // try {
-      //   const result = await axios.request(options)
-      //   return { status: true, data: result.data }
-      // } catch (e) {
-      //   console.log(e)
-      //   throw e
-      // }
+    const apiUrl = this.generateApiUrl(apiRoute, network)
+    log.error('DSafe request failed, execution stopped!', [])
+    log.info('Fetch route:', [apiRoute])
+    const options: AxiosRequestConfig = {}
+    options.method = httpMethod
+    options.url = apiUrl
+    if (payload?.apiData !== undefined) {
+      options.data = payload.apiData
     }
+    try {
+      const result = await axios.request(options)
+      console.log({ result })
+
+      return { status: true, data: result.data }
+    } catch (e: any) {
+      console.error({
+        error: {
+          status: e.status,
+          message: e.message,
+          data: JSON.stringify(e.response.data),
+        },
+      })
+      throw e
+    }
+    return response
   }
 }

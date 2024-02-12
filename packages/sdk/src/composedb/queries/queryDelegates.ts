@@ -40,7 +40,10 @@ query GetDelegate {
   }
 `
 
-export const checkDelegateExists = async (delegate: string, composeClient: ComposeClient): Promise<any> => {
+export const checkDelegateExists = async (
+  delegate: string,
+  composeClient: ComposeClient,
+): Promise<{ exists: boolean; id?: string }> => {
   const executionResult = await composeClient.executeQuery(CHECK_DELEGATE_EXISTS(delegate))
   if (executionResult?.data !== undefined && executionResult.data !== null) {
     const delegateIndex: any = executionResult.data.delegateIndex

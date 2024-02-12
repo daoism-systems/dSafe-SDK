@@ -1,4 +1,5 @@
 import { type ComposeClient } from '@composedb/client'
+import { STATUS_CODE_202, STATUS_CODE_400 } from '../../config/constants.js'
 
 type CreateDelegateInput = Record<string, any>
 
@@ -26,7 +27,13 @@ mutation ComposeDelegate ($input: CreateDelegateInput!) {
 export async function composeDelegate(
   input: CreateDelegateInput,
   composeClient: ComposeClient,
-): Promise<void> {
-  const executionResult = await composeClient.executeQuery(COMPOSE_DELEGATE(), { input })
-  console.log(executionResult)
+): Promise<number> {
+  try {
+    const executionResult = await composeClient.executeQuery(COMPOSE_DELEGATE(), { input })
+    console.log({ executionResult })
+    return STATUS_CODE_202
+  } catch (err) {
+    console.error({ err })
+    return STATUS_CODE_400
+  }
 }
