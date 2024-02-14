@@ -4,7 +4,7 @@ import { checkSignerExists } from '../composedb/queries/querySigner.js'
 import { composeSigner } from '../composedb/mutations/mutateSigner.js'
 import { type UpdateDelegatePayload } from '../types/CREATE_DELEGATE.type.js'
 import { composeDelegate } from '../composedb/mutations/mutateDelegate.js'
-import { checkDelegateExists } from '../composedb/queries/queryDelegates.js'
+import { checkDelegateExists, getDelegate } from '../composedb/queries/queryDelegates.js'
 import { checkSafeExists, getSafe } from '../composedb/queries/querySafe.js'
 // POST /v1/delegates/
 
@@ -15,7 +15,7 @@ const handleUpdateDelegates: RouteHandler<UpdateDelegatePayload> = async (
 ) => {
   const apiData = payload?.apiData
 
-  console.log('Payload.delegate', apiData?.delegate)
+console.log('Payload.delegate', apiData?.delegate)
   // todo: use transaction stream ID to fetch safe instead of taking it from user
   let response: any
   try {
@@ -25,13 +25,36 @@ const handleUpdateDelegates: RouteHandler<UpdateDelegatePayload> = async (
     console.log(e)
   }
   console.log({ response })
-  const data = response.data
+  const data = response?.data
   // check if safe exists
   const safeExist = await checkSafeExists(apiData?.safe as string, composeClient)
   const safeStreamId: string | undefined = safeExist.id
   if (!safeExist.exists) {
     throw Error('Safe does not exist')
   }
+
+  console.log({ safeStreamId, network })
+
+  // check if delegate exists
+  const getDelegateResponse = await getDelegate(
+    safeStreamId as string,
+    network as string,
+    composeClient,
+  )
+  console.log({ getDelegateResponse })
+
+  if (getDelegateResponse.exists) {
+    const delegateExists = getDelegateResponse.delegateData.some((delegate: any) => {
+      console.log({ 1: delegate.delegate, 2: apiData?.delegate })
+
+      return delegate.delegate === apiData?.delegate
+    })
+    if (delegateExists) {
+      console.log('Delegate already exists')
+      return { status: true, data: 'Delegate already exists' }
+    }
+  }
+  console.log('Delegate does not exist')
   // add delegate to the transaction
   const signerExist = await checkSignerExists(apiData?.delegator as string, composeClient)
   let signerStreamId: string | undefined = signerExist.id
@@ -51,7 +74,7 @@ const handleUpdateDelegates: RouteHandler<UpdateDelegatePayload> = async (
     content: {
       delegate: apiData?.delegate,
       delegatorID: signerStreamId,
-      network: 'eip155:1',
+      network,
       safeID: safeStreamId,
     },
   }
