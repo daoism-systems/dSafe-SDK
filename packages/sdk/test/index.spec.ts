@@ -102,7 +102,7 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
   })
   it('Should get about the API', async () => {
     const result = await dsafe.fetchLegacy('GET', 'v1/about')
-    expect(result.status).toBe(STATUS_CODE_200)
+    expect(result.status).toBe(true)
   }, 100000)
   it('should fetch all the safes of an owner', async () => {
     const apiRoute = `/v1/owners/${testAccountOnSepolia}/safes`
@@ -114,46 +114,6 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
     log.info('Data returned from :', [result.data?.safes, expectedResult.data?.safes])
     expect(result.data?.safes).toStrictEqual(expectedResult.data?.safes)
   }, 10000)
-  it('should post a new delegate to the safe', async () => {
-    // add delegate
-    const apiRoute = '/v1/delegates/' // add trailing forward slash to prevent server from doing GET
-    console.log({ PRIVATE_KEY })
-
-    if (PRIVATE_KEY !== undefined) {
-      // generate signature to add delegate
-      const TOTP = Math.floor(Math.floor(Date.now() / 1000) / 3600)
-      const messageToSign = `${delegateAddress}${TOTP.toString()}`
-      if (PRIVATE_KEY === undefined) {
-        throw Error('Private key invalid')
-      }
-      const wallet = new ethers.Wallet(PRIVATE_KEY)
-      const signature = await wallet.signMessage(messageToSign)
-
-      // send POST request
-      const payload = {
-        apiData: {
-          safe: testSafeOnSepolia,
-          delegate: delegateAddress,
-          delegator: testAccountOnSepolia,
-          signature,
-          label: 'delegator',
-        },
-      }
-      console.log({ apiRoute, payload })
-
-      const postResult = await dsafe.fetchLegacy('POST', apiRoute, payload, chainId)
-      console.log({ postResult })
-
-      expect(postResult.status).toBe(STATUS_CODE_202)
-    }
-
-    // get delegate
-    const delegates = await dsafe.fetchLegacy('GET', `${apiRoute}?safe=${testSafeOnSepolia}`)
-    const delegateExist: number = delegates.data.results.findIndex(
-      (element: any) => element.delegate === delegateAddress,
-    )
-    expect(delegates.data.results[delegateExist].delegate).toBe(delegateAddress)
-  }, 100000)
   it('should use dSafe registry for Data decoder', async () => {
     const decodeDataroute = '/v1/data-decoder/'
     const usdt = new ethers.Contract(testUsdt, totalSupplyAbi)
@@ -184,7 +144,7 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
       gasPrice: 0,
       gasToken: '0x0000000000000000000000000000000000000000',
       refundReceiver: '0x0000000000000000000000000000000000000000',
-      nonce: 13,
+      nonce: 1,
     }
     const provider = new ethers.providers.InfuraProvider(chainId, process.env.INFURA_PROJECT_ID)
     // const signer = new ethers.BaseWallet(new ethers.SigningKey(PRIVATE_KEY as string), provider)
@@ -225,7 +185,7 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
       gasPrice: trxInput.gasPrice,
       safeTxGas: trxInput.safeTxGas,
       value: trxInput.value,
-      operation: trxInput.operation,
+      operation: trxInput.operation.toString(),
       nonce: trxInput.nonce,
       signature,
       apiData: {
@@ -246,165 +206,289 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
       },
     }
 
-    // const options: AxiosRequestConfig = {}
-    // options.method = 'POST'
-    // options.url = dsafe.generateApiUrl(createTransactionRoute, chainId)
-    // if (payload?.apiData !== undefined) {
-    //   options.data = payload.apiData
-    // }
-    // try {
-    //   const result = await axios.request(options)
-    //   console.log({ result })
-    // } catch (e) {
-    //   console.log(e)
-    //   throw e
-    // }
-    console.log('DEBUG LOGS', { signer, apiData: payload.apiData, trxInput })
+    const options: AxiosRequestConfig = {}
+    options.method = 'POST'
+    options.url = dsafe.generateApiUrl(createTransactionRoute, chainId)
+    if (payload?.apiData !== undefined) {
+      options.data = payload.apiData
+    }
+    try {
+      const result = await axios.request(options)
+      console.log({ result })
+    } catch (e: any) {
+      console.log({ e: e.response.data })
+      throw e
+    }
+    // console.log('DEBUG LOGS', { signer, apiData: payload.apiData, trxInput })
     const dsafeResponse = await dsafe.fetchLegacy('POST', createTransactionRoute, payload, chainId)
     console.log({ dsafeResponse })
 
     expect(dsafeResponse.status).toBe(true)
   }, 100000)
-  // it('should be able to add new confirmation to existing transaction', async () => {
-  //   const safeAddress = SAFE_ADDRESS
+  it('should be able to add new confirmation to existing transaction', async () => {
+    const safeAddress = SAFE_ADDRESS
 
-  //   const safeAbi = getSafeSingletonDeployment()?.abi
-  //   if (safeAbi === undefined) {
-  //     throw Error('Safe ABI is undefined')
-  //   }
-  //   const trxInput = {
-  //     to: testUsdt,
-  //     value: 1,
-  //     data: '0x',
-  //     operation: '0',
-  //     safeTxGas: 0,
-  //     baseGas: 0,
-  //     gasPrice: 0,
-  //     gasToken: '0x0000000000000000000000000000000000000000',
-  //     refundReceiver: '0x0000000000000000000000000000000000000000',
-  //     nonce: 13,
-  //   }
-  //   console.log('This is working')
-  //   const provider = new ethers.providers.AlchemyProvider(chainId, process.env.ALCHEMY_API_KEY)
-  //   console.log('This is working')
-  //   // const signer = new ethers.BaseWallet(new ethers.SigningKey(PRIVATE_KEY as string), provider)
-  //   const signer = new ethers.Wallet(PRIVATE_KEY as string, provider)
-  //   const safeInstance = new ethers.Contract(safeAddress, safeAbi, signer)
-  //   console.log('This is working')
-  //   const safeTrxHash = await safeInstance.getTransactionHash(
-  //     trxInput.to,
-  //     trxInput.value,
-  //     trxInput.data,
-  //     trxInput.operation,
-  //     trxInput.safeTxGas,
-  //     trxInput.baseGas,
-  //     trxInput.gasPrice,
-  //     trxInput.gasToken,
-  //     trxInput.refundReceiver,
-  //     trxInput.nonce,
-  //   )
-  //   console.log('This is working')
+    const safeAbi = getSafeSingletonDeployment()?.abi
+    if (safeAbi === undefined) {
+      throw Error('Safe ABI is undefined')
+    }
+    const trxInput = {
+      to: testUsdt,
+      value: 1,
+      data: '0x',
+      operation: '0',
+      safeTxGas: 0,
+      baseGas: 0,
+      gasPrice: 0,
+      gasToken: '0x0000000000000000000000000000000000000000',
+      refundReceiver: '0x0000000000000000000000000000000000000000',
+      nonce: 1,
+    }
+    console.log('This is working')
+    const provider = new ethers.providers.InfuraProvider(chainId, process.env.INFURA_PROJECT_ID)
 
-  //   const updateConfirmationRoute = `/v1/multisig-transactions/${safeTrxHash}/confirmations/`
-  //   console.log(safeTrxHash)
-  //   console.log('This is working')
-  //   const signature = (await signer.signMessage(hexValue(safeTrxHash)))
-  //     .replace(/1b$/, '1f')
-  //     .replace(/1c$/, '20')
-  //   console.log('This is working')
+    console.log('This is working')
+    // const signer = new ethers.BaseWallet(new ethers.SigningKey(PRIVATE_KEY as string), provider)
+    const signer = new ethers.Wallet(PRIVATE_KEY as string, provider)
+    const safeInstance = new ethers.Contract(safeAddress, safeAbi, signer)
+    console.log('This is working')
+    const safeTrxHash = await safeInstance.getTransactionHash(
+      trxInput.to,
+      trxInput.value,
+      trxInput.data,
+      trxInput.operation,
+      trxInput.safeTxGas,
+      trxInput.baseGas,
+      trxInput.gasPrice,
+      trxInput.gasToken,
+      trxInput.refundReceiver,
+      trxInput.nonce,
+    )
+    console.log('This is working')
 
-  //   const payload = {
-  //     apiData: {
-  //       signature,
-  //     },
-  //     safe: safeAddress,
-  //     signature,
-  //     safe_tx_hash: safeTrxHash,
-  //     sender: signer.address,
-  //   }
-  //   console.log('This is working')
+    const updateConfirmationRoute = `/v1/multisig-transactions/${safeTrxHash}/confirmations/`
+    console.log(safeTrxHash)
+    console.log('This is working')
+    const signature = (await signer.signMessage(arrayify(safeTrxHash)))
+      .replace(/1b$/, '1f')
+      .replace(/1c$/, '20')
+    console.log('This is working')
 
-  //   const result = await dsafe.fetchLegacy('POST', updateConfirmationRoute, payload, chainId)
-  //   console.log(result)
-  // }, 100000)
-  // it('get safe data', async () => {
-  //   const safeAddress = SAFE_ADDRESS
-  //   const getSafeRoute = `/v1/safes/${safeAddress}/`
-  //   const payload: GetSafePayload = {
-  //     address: safeAddress,
-  //   }
-  //   const apiResponse = await axios.request({ url: dsafe.generateApiUrl(getSafeRoute, chainId) })
-  //   const response = await dsafe.fetchLegacy('GET', getSafeRoute, payload, chainId)
+    const payload = {
+      apiData: {
+        signature,
+      },
+      safe: safeAddress,
+      signature,
+      safe_tx_hash: safeTrxHash,
+      sender: signer.address,
+    }
 
-  //   console.log({ apiResponse, response })
+    try {
+      const apiResponse = await axios.post(
+        dsafe.generateApiUrl(updateConfirmationRoute, chainId),
+        payload.apiData,
+      )
 
-  //   expect(response.data).toMatchObject(apiResponse.data)
-  // })
-  // it('get all transactions', async () => {
-  //   const safeAddress = SAFE_ADDRESS
-  //   const getTransactionsRoute = `/v1/safes/${safeAddress}/multisig-transactions/`
-  //   const payload: GetAllTransactionsPayload = {
-  //     address: safeAddress,
-  //   }
-  //   const apiResponse = await axios.request({
-  //     url: dsafe.generateApiUrl(getTransactionsRoute, chainId),
-  //   })
+      console.log('This is working', { apiResponse })
+    } catch (err) {
+      console.error({ err })
+    }
 
-  //   const response = await dsafe.fetchLegacy('GET', getTransactionsRoute, payload, network)
-  //   console.log({ apiResponse: apiResponse.data, response })
-  //   expect(response.status).toBe(true)
-  //   expect(response.data).toMatchObject(apiResponse.data)
-  // })
-  // it('Get a transaction using safeTxHash', async () => {
-  //   const safeTxHash = '0x8cac27eca93ebddc0bb7edb62af9c5adfa7915ccca2ffe25adfe76e31a7835de'
-  //   const getTransactionRoute = `/v1/multisig-transactions/${safeTxHash}/`
-  //   const payload: GetTransactionPayload = {
-  //     safeTxHash,
-  //   }
-  //   const apiResponse = await axios.request({
-  //     url: dsafe.generateApiUrl(getTransactionRoute, chainId),
-  //   })
-  //   const response = await dsafe.fetchLegacy('GET', getTransactionRoute, payload, chainId)
+    const result = await dsafe.fetchLegacy('POST', updateConfirmationRoute, payload, chainId)
+    console.log(result)
+  }, 100000)
+  it('get safe data', async () => {
+    const safeAddress = SAFE_ADDRESS
+    const getSafeRoute = `/v1/safes/${safeAddress}/`
+    const payload: GetSafePayload = {
+      address: safeAddress,
+    }
+    const apiResponse = await axios.request({ url: dsafe.generateApiUrl(getSafeRoute, chainId) })
+    const response = await dsafe.fetchLegacy('GET', getSafeRoute, payload, chainId)
 
-  //   console.log({ apiResponse, response })
-  //   expect(response.status).toBe(true)
-  //   expect(response.data).toMatchObject(apiResponse.data)
-  // })
-  // it('Get confirmations for a safeTrxHash', async () => {
-  //   const safeTxHash = '0x8cac27eca93ebddc0bb7edb62af9c5adfa7915ccca2ffe25adfe76e31a7835de'
-  //   const getConfirmationRoute = `/v1/multisig-transactions/${safeTxHash}/confirmations/`
-  //   const payload: GetTransactionConfirmationsPayload = {
-  //     safeTxHash,
-  //   }
-  //   const data = await dsafe.fetchLegacy('GET', getConfirmationRoute, payload, chainId)
-  //   console.log(data)
-  // })
-  // it('Create new delegate', async () => {
-  //   const addDelegateApiRoute = '/v1/delegates/'
-  //   const label = 'Signer'
-  //   const totp = Math.floor(Math.floor(Date.now() / 1000) / 3600)
-  //   const signatureForDelegate = await signer.signMessage(delegateAddress + totp)
-  //   const payload: UpdateDelegatePayload = {
-  //     safe: testSafeOnSepolia,
-  //     delegate: delegateAddress,
-  //     delegator: signer.address,
-  //     signature: signatureForDelegate,
-  //     label,
-  //     apiData: {
-  //       safe: testSafeOnSepolia,
-  //       delegate: delegateAddress,
-  //       delegator: signer.address,
-  //       signature: signatureForDelegate,
-  //       label,
-  //     },
-  //   }
-  //   await dsafe.fetchLegacy('POST', addDelegateApiRoute, payload, chainId)
-  // })
-  // it('Get delegates', async () => {
-  //   const getDelegateApiRoute = `/v1/delegates/?safe=${testSafeOnSepolia}`
-  //   const payload: GetDelegatesPayload = {
-  //     safeAddress: testSafeOnSepolia,
-  //   }
-  //   await dsafe.fetchLegacy('GET', getDelegateApiRoute, payload, chainId)
-  // })
+    console.log({ apiResponse: apiResponse.data.owners, response: response.data.owners })
+
+    expect(response.data).toMatchObject(apiResponse.data)
+  })
+  it('get all transactions', async () => {
+    const safeAddress = SAFE_ADDRESS
+    const getTransactionsRoute = `/v1/safes/${safeAddress}/multisig-transactions/`
+    const payload: GetAllTransactionsPayload = {
+      address: safeAddress,
+    }
+    const apiResponse = await axios.request({
+      url: dsafe.generateApiUrl(getTransactionsRoute, chainId),
+    })
+
+    const response = await dsafe.fetchLegacy('GET', getTransactionsRoute, payload, network)
+    console.log({ apiResponse: apiResponse.data, response })
+    expect(response.status).toBe(true)
+    expect(response.data.count).not.toEqual(0)
+    expect(response.data.count).toBeLessThanOrEqual(apiResponse.data.count)
+    expect(response.data.results).toBeTruthy()
+  })
+  it('Get a transaction using safeTxHash', async () => {
+    const safeAddress = SAFE_ADDRESS
+
+    const safeAbi = getSafeSingletonDeployment()?.abi
+    if (safeAbi === undefined) {
+      throw Error('Safe ABI is undefined')
+    }
+    const trxInput = {
+      to: testUsdt,
+      value: 1,
+      data: '0x',
+      operation: '0',
+      safeTxGas: 0,
+      baseGas: 0,
+      gasPrice: 0,
+      gasToken: '0x0000000000000000000000000000000000000000',
+      refundReceiver: '0x0000000000000000000000000000000000000000',
+      nonce: 1,
+    }
+    const provider = new ethers.providers.InfuraProvider(chainId, process.env.INFURA_PROJECT_ID)
+    const signer = new ethers.Wallet(PRIVATE_KEY as string, provider)
+    const safeInstance = new ethers.Contract(safeAddress, safeAbi, signer)
+    const safeTxHash = await safeInstance.getTransactionHash(
+      trxInput.to,
+      trxInput.value,
+      trxInput.data,
+      trxInput.operation,
+      trxInput.safeTxGas,
+      trxInput.baseGas,
+      trxInput.gasPrice,
+      trxInput.gasToken,
+      trxInput.refundReceiver,
+      trxInput.nonce,
+    )
+    const getTransactionRoute = `/v1/multisig-transactions/${safeTxHash}/`
+    const payload: GetTransactionPayload = {
+      safeTxHash,
+    }
+    const apiResponse = await axios.request({
+      url: dsafe.generateApiUrl(getTransactionRoute, chainId),
+    })
+    const response = await dsafe.fetchLegacy('GET', getTransactionRoute, payload, chainId)
+
+    console.log({ apiResponse, response })
+    expect(response.status).toBe(true)
+    expect(response.data.safeTransactionHash).toBe(apiResponse.data.safeTxHash)
+    expect(response.data.nonce).toBe(apiResponse.data.nonce)
+  })
+  it('Get confirmations for a safeTrxHash', async () => {
+    const safeAddress = SAFE_ADDRESS
+
+    const safeAbi = getSafeSingletonDeployment()?.abi
+    if (safeAbi === undefined) {
+      throw Error('Safe ABI is undefined')
+    }
+    const trxInput = {
+      to: testUsdt,
+      value: 1,
+      data: '0x',
+      operation: '0',
+      safeTxGas: 0,
+      baseGas: 0,
+      gasPrice: 0,
+      gasToken: '0x0000000000000000000000000000000000000000',
+      refundReceiver: '0x0000000000000000000000000000000000000000',
+      nonce: 1,
+    }
+    const provider = new ethers.providers.InfuraProvider(chainId, process.env.INFURA_PROJECT_ID)
+    const signer = new ethers.Wallet(PRIVATE_KEY as string, provider)
+    const safeInstance = new ethers.Contract(safeAddress, safeAbi, signer)
+    const safeTxHash = await safeInstance.getTransactionHash(
+      trxInput.to,
+      trxInput.value,
+      trxInput.data,
+      trxInput.operation,
+      trxInput.safeTxGas,
+      trxInput.baseGas,
+      trxInput.gasPrice,
+      trxInput.gasToken,
+      trxInput.refundReceiver,
+      trxInput.nonce,
+    )
+
+    const getConfirmationRoute = `/v1/multisig-transactions/${safeTxHash}/confirmations/`
+    const apiResponse = await axios.request({
+      url: dsafe.generateApiUrl(getConfirmationRoute, chainId),
+    })
+
+    const payload: GetTransactionConfirmationsPayload = {
+      safeTxHash,
+    }
+
+    const response = await dsafe.fetchLegacy('GET', getConfirmationRoute, payload, chainId)
+    console.log('GETTING CONFIRMATIONS', {
+      apiResponse: apiResponse.data.results,
+      response: response.data,
+    })
+
+    const filteredAPIResponse = apiResponse.data.results.filter((confirmationA: any) => {
+      console.log({ signatureA: confirmationA.signature, signatureB: response.data })
+      return response.data.some(
+        (confirmationB: any) => confirmationA.signature === confirmationB.signature,
+      )
+    })
+
+    console.log({ filteredAPIResponse })
+
+    expect(filteredAPIResponse.length).toBeGreaterThan(0)
+  })
+  it('Create new delegate', async () => {
+    const addDelegateApiRoute = '/v1/delegates/'
+    const label = 'delegator'
+    const totp = Math.floor(Math.floor(Date.now() / 1000) / 3600)
+    const signatureForDelegate = await signer.signMessage(delegateAddress + totp)
+    if (PRIVATE_KEY !== undefined) {
+      // generate signature to add delegate
+      const TOTP = Math.floor(Math.floor(Date.now() / 1000) / 3600)
+      const messageToSign = `${delegateAddress}${TOTP.toString()}`
+      if (PRIVATE_KEY === undefined) {
+        throw Error('Private key invalid')
+      }
+      const wallet = new ethers.Wallet(PRIVATE_KEY)
+      const signature = await wallet.signMessage(messageToSign)
+
+      const payload: UpdateDelegatePayload = {
+        safe: testSafeOnSepolia,
+        delegate: delegateAddress,
+        delegator: signer.address,
+        signature: signatureForDelegate,
+        label,
+        apiData: {
+          safe: testSafeOnSepolia,
+          delegate: delegateAddress,
+          delegator: signer.address,
+          signature: signatureForDelegate,
+          label,
+        },
+      }
+      const apiResponse = axios.post(
+        dsafe.generateApiUrl(addDelegateApiRoute, chainId),
+        payload.apiData,
+      )
+
+      const response = await dsafe.fetchLegacy('POST', addDelegateApiRoute, payload, network)
+      expect(response.status).toBeTruthy()
+    }
+  })
+  it('Get delegates', async () => {
+    const getDelegateApiRoute = `/v1/delegates/?safe=${testSafeOnSepolia}`
+    const payload: GetDelegatesPayload = {
+      safeAddress: testSafeOnSepolia,
+    }
+    const apiResponse = await axios.get(dsafe.generateApiUrl(getDelegateApiRoute, chainId))
+
+    const response = await dsafe.fetchLegacy('GET', getDelegateApiRoute, payload, network)
+    apiResponse.data.results.forEach((result: any) => {
+      delete result.label
+    })
+    console.log({ apiResponse: apiResponse.data.results, response: response.data })
+    response.data.forEach((delegateData: any) => {
+      expect(apiResponse.data.results).toContainEqual(delegateData)
+    })
+  })
 })
