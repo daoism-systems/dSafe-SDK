@@ -24,8 +24,11 @@ const handleGetTransactionConfirmations: RouteHandler<GetTransactionConfirmation
     networkId as string,
     composeClient,
   )
-  console.log(transactionExists)
-  return transactionExists.exists
+  console.log({ transactionExists })
+  return {
+    status: transactionExists.exists,
+    data: transactionExists.confirmationData.confirmations.edges.map((edge: any) => edge.node),
+  }
 }
 
 export default handleGetTransactionConfirmations
