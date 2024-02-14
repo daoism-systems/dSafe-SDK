@@ -165,6 +165,8 @@ export const getAllTransactions = async (
   networkId: string,
   composeClient: ComposeClient,
 ): Promise<{ exists: boolean; data?: any }> => {
+  console.log('SAFEID', { safeId })
+
   const executionResult = await composeClient.executeQuery(
     GET_TRANSACTIONS_OF_SAFE(safeId, networkId),
   )
@@ -173,7 +175,10 @@ export const getAllTransactions = async (
     const transactionIndex: any = executionResult.data.transactionIndex
     if (transactionIndex.edges.length !== 0) {
       console.log('Transaction exists')
-      const returnData = { exists: true, transactionData: transactionIndex.edges[0].node }
+      const returnData = {
+        exists: true,
+        data: transactionIndex.edges.map((edge: any) => edge.node),
+      }
       return returnData
     } else {
       return { exists: false, data: undefined }
