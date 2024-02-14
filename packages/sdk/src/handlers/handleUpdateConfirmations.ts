@@ -22,7 +22,7 @@ const handleUpdateConfirmations: RouteHandler<UPDATE_CONFIRMATION_PAYLOAD> = asy
   )
   console.log(transactionExists)
   if (!transactionExists.exists) {
-    throw Error('Transaction doesn\'t exist')
+    throw Error('Transaction does not exist')
   }
   // todo: use transaction stream ID to fetch safe instead of taking it from user
   let response: any
@@ -36,8 +36,8 @@ const handleUpdateConfirmations: RouteHandler<UPDATE_CONFIRMATION_PAYLOAD> = asy
   // add confirmation to the transaction
   const signerExist = await checkSignerExists(payload?.sender as string, composeClient)
   let signerStreamId: string | undefined = signerExist.id
-  if (!signerExist.exists && (data.owners.includes(payload?.sender) === true)) {
-    console.log('Sender is signer but isn\'t Signer entity isn\'t created for the sender')
+  if (!signerExist.exists && data.owners.includes(payload?.sender) === true) {
+    console.log('Sender is signer but is not Signer entity is not created for the sender')
     const input = {
       content: {
         signer: payload?.sender,
@@ -47,7 +47,7 @@ const handleUpdateConfirmations: RouteHandler<UPDATE_CONFIRMATION_PAYLOAD> = asy
     const signerCreated = await checkSignerExists(payload?.sender as string, composeClient)
     console.log(`Signer Created: ${signerCreated.exists}`)
     signerStreamId = signerCreated.id
-    console.log(`Signer Stream ID: ${signerStreamId}`);
+    console.log(`Signer Stream ID: ${signerStreamId}`)
   }
   const confirmationInput = {
     content: {
@@ -63,7 +63,7 @@ const handleUpdateConfirmations: RouteHandler<UPDATE_CONFIRMATION_PAYLOAD> = asy
     composeClient,
   )
   console.log(`Confirmation Created: ${confirmationCreated.exists}`)
-  return true
+  return { status: true, data: confirmationCreated }
 }
 
 export default handleUpdateConfirmations
