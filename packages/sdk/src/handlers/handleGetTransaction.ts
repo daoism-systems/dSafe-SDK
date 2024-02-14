@@ -23,8 +23,7 @@ const handleGetTransaction: RouteHandler<GetTransactionPayload> = async (
     networkId as string,
     composeClient,
   )
-  console.log(transactionExists)
-  return transactionExists.exists
+  return { status: transactionExists.exists, data: transactionExists.id }
 }
 
 export default handleGetTransaction
