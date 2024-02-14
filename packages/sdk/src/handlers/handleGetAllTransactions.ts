@@ -6,14 +6,14 @@ import type RouteHandler from '../types/ROUTE_HANDLER.type.js'
 import { checkSafeExists } from '../composedb/queries/querySafe.js'
 import { getAllTransactions } from '../composedb/queries/queryTransaction.js'
 import { type GetAllTransactionsPayload } from '../types/GET_ALL_TRANSACTIONS.js'
-
-const networkId = 'eip155:1'
+import { CAIP } from '../config/networks.js'
 
 const handleGetAllTransactions: RouteHandler<GetAllTransactionsPayload> = async (
   composeClient: ComposeClient,
   payload?: GetAllTransactionsPayload,
   network?: string,
 ) => {
+  const networkId = network ? CAIP[network] : ''
   // ensure address is not undefined
   if (payload?.address === undefined) {
     throw Error('Safe address not defined in payload')
@@ -25,7 +25,7 @@ const handleGetAllTransactions: RouteHandler<GetAllTransactionsPayload> = async 
   }
   const safeId = safeExists.id
   // get transactions where safe ID
-  const transactions = await getAllTransactions(`${safeId}`, networkId as string, composeClient)
+  const transactions = await getAllTransactions(`${safeId}`, networkId, composeClient)
 
   const responseData = {
     count: transactions?.data?.length ?? 0,

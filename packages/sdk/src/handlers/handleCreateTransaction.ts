@@ -21,6 +21,7 @@ import { composeSignerSafe } from '../composedb/mutations/mutateSignerSafe.js'
 import { checkSignerSafeExists } from '../composedb/queries/querySignerSafe.js'
 import { type DSafeResponse } from './handler.js'
 import type RouteHandler from '../types/ROUTE_HANDLER.type.js'
+import { CAIP } from '../config/networks.js'
 
 const handleCreateTransaction: RouteHandler<CreateTransactionPayload> = async (
   composeClient: ComposeClient,
@@ -57,7 +58,7 @@ const handleCreateTransaction: RouteHandler<CreateTransactionPayload> = async (
   const deployedBlockNumber = 10
 
   // todo: find caip network ID for network string
-  const networkId = 'eip155:1'
+  const networkId = CAIP[network]
 
   const data = response.data
   console.log({ data: JSON.stringify(response.data) })

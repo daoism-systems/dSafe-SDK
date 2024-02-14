@@ -2,12 +2,7 @@
 import dotenv from 'dotenv'
 import DSafe from '../src/index.js'
 import { describe, expect } from '@jest/globals'
-import {
-  API_ENDPOINT,
-  STATUS_CODE_200,
-  STATUS_CODE_201,
-  STATUS_CODE_202,
-} from '../src/config/constants.js'
+import { API_ENDPOINT } from '../src/config/constants.js'
 import { ERROR_CODE } from '../src/config/ERROR_CODES.js'
 import NETWORKS from '../src/config/networks.js'
 import Logger from '../src/utils/Logger.utils.js'
@@ -19,8 +14,16 @@ import { type GetTransactionPayload } from '../src/types/GET_TRANSACTION_PAYLOAD
 import { type GetTransactionConfirmationsPayload } from '../src/types/GET_TRANSACTION_CONFIRMATIONS_PAYLOAD.type.js'
 import { type UpdateDelegatePayload } from '../src/types/CREATE_DELEGATE.type.js'
 import { type GetDelegatesPayload } from '../src/types/GET_DELEGATES.type.js'
-import { arrayify, hexValue } from 'ethers/lib/utils.js'
-import { SAFE_ADDRESS, TEST_ACCOUNT } from './secrets.js'
+import { arrayify } from 'ethers/lib/utils.js'
+import {
+  SAFE_ADDRESS,
+  TEST_ACCOUNT,
+  ceramicNodeNetwork,
+  delegateAddress,
+  network,
+  testUsdt,
+  trxInput,
+} from './secrets.js'
 import axios, { type AxiosRequestConfig } from 'axios'
 
 dotenv.config({ path: './.env' })
@@ -31,16 +34,13 @@ const PRIVATE_KEY = process.env.PRIVATE_KEY
 
 describe('DSafe: Forward API request to Safe API endpoint', () => {
   const chainId: string = NETWORKS.SEPOLIA
-  const network: string = 'eip155:1'
+
   let dsafe: DSafe
   let signer: Wallet
-  const ceramicNodeNetwork = 'local'
   const demoApiRouteWithoutSlash: string = 'sendTransactions'
   const demoApiRouteWithSlash: string = '/sendTransactions'
   const testAccountOnSepolia = TEST_ACCOUNT
   const testSafeOnSepolia = SAFE_ADDRESS
-  const delegateAddress = '0xd18Cd50a6bDa288d331e3956BAC496AAbCa4960d'
-  const testUsdt = '0x7169D38820dfd117C3FA1f22a697dBA58d90BA06'
   const totalSupplyAbi = [
     {
       constant: true,
@@ -134,18 +134,6 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
     if (safeAbi === undefined) {
       throw Error('Safe ABI is undefined')
     }
-    const trxInput = {
-      to: testUsdt,
-      value: 1,
-      data: '0x',
-      operation: 0,
-      safeTxGas: 0,
-      baseGas: 0,
-      gasPrice: 0,
-      gasToken: '0x0000000000000000000000000000000000000000',
-      refundReceiver: '0x0000000000000000000000000000000000000000',
-      nonce: 1,
-    }
     const provider = new ethers.providers.InfuraProvider(chainId, process.env.INFURA_PROJECT_ID)
     // const signer = new ethers.BaseWallet(new ethers.SigningKey(PRIVATE_KEY as string), provider)
     const signer = new ethers.Wallet(PRIVATE_KEY as string, provider)
@@ -232,18 +220,7 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
     if (safeAbi === undefined) {
       throw Error('Safe ABI is undefined')
     }
-    const trxInput = {
-      to: testUsdt,
-      value: 1,
-      data: '0x',
-      operation: '0',
-      safeTxGas: 0,
-      baseGas: 0,
-      gasPrice: 0,
-      gasToken: '0x0000000000000000000000000000000000000000',
-      refundReceiver: '0x0000000000000000000000000000000000000000',
-      nonce: 1,
-    }
+
     console.log('This is working')
     const provider = new ethers.providers.InfuraProvider(chainId, process.env.INFURA_PROJECT_ID)
 
@@ -335,18 +312,7 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
     if (safeAbi === undefined) {
       throw Error('Safe ABI is undefined')
     }
-    const trxInput = {
-      to: testUsdt,
-      value: 1,
-      data: '0x',
-      operation: '0',
-      safeTxGas: 0,
-      baseGas: 0,
-      gasPrice: 0,
-      gasToken: '0x0000000000000000000000000000000000000000',
-      refundReceiver: '0x0000000000000000000000000000000000000000',
-      nonce: 1,
-    }
+
     const provider = new ethers.providers.InfuraProvider(chainId, process.env.INFURA_PROJECT_ID)
     const signer = new ethers.Wallet(PRIVATE_KEY as string, provider)
     const safeInstance = new ethers.Contract(safeAddress, safeAbi, signer)
@@ -382,18 +348,6 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
     const safeAbi = getSafeSingletonDeployment()?.abi
     if (safeAbi === undefined) {
       throw Error('Safe ABI is undefined')
-    }
-    const trxInput = {
-      to: testUsdt,
-      value: 1,
-      data: '0x',
-      operation: '0',
-      safeTxGas: 0,
-      baseGas: 0,
-      gasPrice: 0,
-      gasToken: '0x0000000000000000000000000000000000000000',
-      refundReceiver: '0x0000000000000000000000000000000000000000',
-      nonce: 1,
     }
     const provider = new ethers.providers.InfuraProvider(chainId, process.env.INFURA_PROJECT_ID)
     const signer = new ethers.Wallet(PRIVATE_KEY as string, provider)
@@ -444,13 +398,9 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
     const signatureForDelegate = await signer.signMessage(delegateAddress + totp)
     if (PRIVATE_KEY !== undefined) {
       // generate signature to add delegate
-      const TOTP = Math.floor(Math.floor(Date.now() / 1000) / 3600)
-      const messageToSign = `${delegateAddress}${TOTP.toString()}`
       if (PRIVATE_KEY === undefined) {
         throw Error('Private key invalid')
       }
-      const wallet = new ethers.Wallet(PRIVATE_KEY)
-      const signature = await wallet.signMessage(messageToSign)
 
       const payload: UpdateDelegatePayload = {
         safe: testSafeOnSepolia,
@@ -466,10 +416,7 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
           label,
         },
       }
-      const apiResponse = axios.post(
-        dsafe.generateApiUrl(addDelegateApiRoute, chainId),
-        payload.apiData,
-      )
+      await axios.post(dsafe.generateApiUrl(addDelegateApiRoute, chainId), payload.apiData)
 
       const response = await dsafe.fetchLegacy('POST', addDelegateApiRoute, payload, network)
       expect(response.status).toBeTruthy()
