@@ -28,9 +28,9 @@ const routeHandlers: Record<string, RouteHandler<any>> = {
   '^GET /v1/safes/0x[a-fA-F0-9]+/multisig-transactions/$': handleGetAllTransactions,
   '^GET /v1/multisig-transactions/0x[a-fA-F0-9]+/$': handleGetTransaction,
   '^GET /v1/multisig-transactions/0x[a-fA-F0-9]+/confirmations/$':
-    handleGetTransactionConfirmations,
+  handleGetTransactionConfirmations,
   '^POST /v1/delegates/$': handleUpdateDelegates,
-  '^GET /v1/delegates/?safe=0x[a-fA-F0-9]+$': handleGetDelegates,
+  '^GET /v1/delegates/\\?safe=0x[a-fA-F0-9]+$': handleGetDelegates,
 }
 
 export interface DSafeResponse {
