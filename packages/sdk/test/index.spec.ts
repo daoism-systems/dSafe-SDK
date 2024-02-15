@@ -28,7 +28,6 @@ import axios, { type AxiosRequestConfig } from 'axios'
 
 dotenv.config({ path: './.env' })
 const log = new Logger()
-// const expect = chai.expect
 
 const PRIVATE_KEY = process.env.PRIVATE_KEY
 
@@ -300,10 +299,12 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
       url: dsafe.generateApiUrl(getTransactionsRoute, chainId),
     })
 
-    const response = await dsafe.fetchLegacy('GET', getTransactionsRoute, payload, network)
+    const response = await dsafe.fetchLegacy('GET', getTransactionsRoute, payload, chainId)
     console.log({ apiResponse: apiResponse.data, response })
     expect(response.status).toBe(true)
-    expect(response.data.count).not.toEqual(0)
+    if (apiResponse.data.count > 0) {
+      expect(response.data.count).not.toEqual(0)
+    }
     expect(response.data.count).toBeLessThanOrEqual(apiResponse.data.count)
     expect(response.data.results).toBeTruthy()
   })
