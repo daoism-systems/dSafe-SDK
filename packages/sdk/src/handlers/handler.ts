@@ -10,6 +10,7 @@ import handleGetTransaction from './handleGetTransaction.js'
 import handleGetTransactionConfirmations from './handleGetConfirmations.js'
 import handleUpdateDelegates from './handleUpdateDelegates.js'
 import handleGetDelegates from './handleGetDelegates.js'
+import handleGetOwnersSafes from './handleGetOwnersSafes.js'
 
 const log = new Logger()
 
@@ -28,9 +29,10 @@ const routeHandlers: Record<string, RouteHandler<any>> = {
   '^GET /v1/safes/0x[a-fA-F0-9]+/multisig-transactions/$': handleGetAllTransactions,
   '^GET /v1/multisig-transactions/0x[a-fA-F0-9]+/$': handleGetTransaction,
   '^GET /v1/multisig-transactions/0x[a-fA-F0-9]+/confirmations/$':
-  handleGetTransactionConfirmations,
+    handleGetTransactionConfirmations,
   '^POST /v1/delegates/$': handleUpdateDelegates,
   '^GET /v1/delegates/\\?safe=0x[a-fA-F0-9]+$': handleGetDelegates,
+  '^GET /v1/owners/0x[a-fA-F0-9]+/safes/$': handleGetOwnersSafes,
 }
 
 export interface DSafeResponse {

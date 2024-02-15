@@ -45,6 +45,26 @@ query GetSafe {
 }
 `
 
+const GET_OWNERS_SAFES = (ownerAddress: string): string => `
+query GetOwnersSafes {
+  signerIndex(first:1, filters:{where: {signer: {equalTo: "${ownerAddress}" }}}) {
+    edges {
+      node {
+        signerSafeRelations(first:10) {
+          edges {
+            node {
+              safeID
+              safe {
+                safeAddress
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}`
+
 // Using the query in a component
 export const checkSafeExists = async (
   safeAddress: string,
@@ -92,4 +112,21 @@ export const getSafe = async (
     }
   }
   return { exists: false, safeData: undefined }
+}
+
+export const getOwnersSafes = async (
+  ownerAddress: string,
+  composeClient: ComposeClient,
+): Promise<{ exists: boolean; data: any }> => {
+  const executionResult = await composeClient.executeQuery(GET_OWNERS_SAFES(ownerAddress))
+  if (executionResult?.data !== undefined && executionResult?.data !== null) {
+    const signerIndex: any = executionResult?.data?.signerIndex
+    console.log({ signerIndex })
+    const returnData = signerIndex.edges[0].node.signerSafeRelations.edges.map((safeNode: any) => ({
+      id: safeNode.node.safeID,
+      safeAddress: safeNode.node.safe.safeAddress,
+    }))
+    return { exists: true, data: returnData }
+  }
+  return { exists: false, data: null }
 }

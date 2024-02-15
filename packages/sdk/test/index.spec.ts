@@ -105,14 +105,16 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
     expect(result.status).toBe(true)
   }, 100000)
   it('should fetch all the safes of an owner', async () => {
-    const apiRoute = `/v1/owners/${testAccountOnSepolia}/safes`
+    const apiRoute = `/v1/owners/${testAccountOnSepolia}/safes/`
     const options: AxiosRequestConfig = {}
     options.method = 'GET'
     options.url = dsafe.generateApiUrl(apiRoute)
     const expectedResult = await axios.request(options)
-    const result = await dsafe.fetchLegacy('GET', apiRoute)
+    const result = await dsafe.fetchLegacy('GET', apiRoute, { address: testAccountOnSepolia })
     log.info('Data returned from :', [result.data?.safes, expectedResult.data?.safes])
-    expect(result.data?.safes).toStrictEqual(expectedResult.data?.safes)
+    expect(result.data?.map((safe: any) => safe.safeAddress)).toStrictEqual(
+      expectedResult.data?.safes,
+    )
   }, 10000)
   it('should use dSafe registry for Data decoder', async () => {
     const decodeDataroute = '/v1/data-decoder/'
