@@ -1,6 +1,5 @@
 import { type ComposeClient } from '@composedb/client'
 import type RouteHandler from '../types/ROUTE_HANDLER.type.js'
-import { type GetSafePayload } from '../types/GET_SAFE_PAYLOAD.type.js'
 import { type GetOwnersSafesPayload } from '../types/GET_OWNERS_SAFES_PAYLOAD.type.js'
 import { getOwnersSafes } from '../composedb/queries/querySafe.js'
 
