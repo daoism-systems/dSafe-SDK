@@ -6,4 +6,5 @@ coverage
 package.json
 tsconfig.json
 **/*.dev.json
+**/*.dev.js
 node_modules/

@@ -21,8 +21,8 @@ const handleGetDelegates: RouteHandler<GetDelegatesPayload> = async (
     network as string,
     composeClient,
   )
-  console.log(getDelegateResponse)
-  return getDelegateResponse.exists
+  console.log({ getDelegateResponse })
+  return { status: getDelegateResponse.exists, data: getDelegateResponse.delegateData }
 }
 
 export default handleGetDelegates

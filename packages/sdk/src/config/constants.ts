@@ -6,17 +6,21 @@ export const API_ENDPOINT = (network: string): string =>
 
 export const API_NETWORKS: SAFE_API_NETWORK = {
   mainnet: 'mainnet',
-  goerli: 'goerli',
   optimism: 'optimism',
+  sepolia: 'sepolia',
 }
 
 export const CERAMIC_NETWORKS: CeramicNetwork = {
-  local: 'http://localhost:7007',
+  local: 'http://0.0.0.0:7007',
   testnet: '',
   mainnet: '',
 }
 
 export const STATUS_CODE_200 = 200
+
+export const STATUS_CODE_201 = 201
+
+export const STATUS_CODE_202 = 202
 
 export const STATUS_CODE_400 = 400
 

@@ -16,7 +16,7 @@
     "publish": "bash shell/publish.sh",
     "publish:npm": "yarn npm publish --access public",
     "test": "node --experimental-vm-modules ../../node_modules/jest/bin/jest.js",
-    "coverage": "c8 --all  yarn test",
+    "coverage": "c8 --all --reporter html yarn test",
     "tsnode": "ts-node --esm"
   },
   "engines": {
@@ -38,7 +38,7 @@
     "chai": "^4.3.10",
     "dotenv": "^16.3.1",
     "eslint": "^8.0.1",
-    "ethers": "^6.8.1",
+    "ethers": "5.7.2",
     "jest": "^29.7.0",
     "ora": "^7.0.1",
     "sinon": "^17.0.0",

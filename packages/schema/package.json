@@ -21,7 +21,7 @@
   "license": "MIT",
   "packageManager": "yarn@3.6.4",
   "scripts": {
-    "tsnode": "ts-node --esm",
+    "tsnode": "node --loader ts-node/esm",
     "create:composite": "yarn tsnode createComposite.ts",
     "deploy": "bash shell/deploy.sh",
     "share:definitions": "yarn tsnode moveDefinitions.ts",

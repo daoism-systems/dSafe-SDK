@@ -40,7 +40,10 @@ query GetDelegate {
   }
 `
 
-export const checkDelegateExists = async (delegate: string, composeClient: ComposeClient): Promise<any> => {
+export const checkDelegateExists = async (
+  delegate: string,
+  composeClient: ComposeClient,
+): Promise<{ exists: boolean; id?: string }> => {
   const executionResult = await composeClient.executeQuery(CHECK_DELEGATE_EXISTS(delegate))
   if (executionResult?.data !== undefined && executionResult.data !== null) {
     const delegateIndex: any = executionResult.data.delegateIndex
@@ -64,21 +67,21 @@ export const getDelegate = async (
   const executionResult = await composeClient.executeQuery(GET_ALL_DELEGATES_QUERY(safeId, network))
   if (executionResult?.data !== undefined && executionResult.data !== null) {
     const delegateIndex: any = executionResult.data.delegateIndex
-    console.log(delegateIndex)
     if (delegateIndex?.edges?.length !== 0) {
       console.log('safe exists')
-      const delegateData: DelegateData[] = []
-      delegateIndex.edges.forEach((i: number) =>
-        delegateData.push({
-          safe: delegateIndex.edges[i].node.safe.safeAddress,
-          delegate: delegateIndex.edges[i].node.delegate,
-          delegator: delegateIndex.edges[i].node.delegator.signer,
-        }),
-      )
+      const delegateData: DelegateData[] = delegateIndex?.edges?.map((delegate: any) => {
+        return {
+          safe: delegate.node.safe.safeAddress,
+          delegate: delegate.node.delegate,
+          delegator: delegate.node.delegator.signer,
+        }
+      })
+      console.log({ delegateData, delegateIndex: delegateIndex.edges })
+
       const returnData = { exists: true, delegateData }
       return returnData
     } else {
-      return { exists: false, delegateData: undefined }
+      return { exists: false, delegateData: [] }
     }
   }
   return { exists: false, delegateData: undefined }

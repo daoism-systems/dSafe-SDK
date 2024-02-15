@@ -10,6 +10,7 @@ import handleGetTransaction from './handleGetTransaction.js'
 import handleGetTransactionConfirmations from './handleGetConfirmations.js'
 import handleUpdateDelegates from './handleUpdateDelegates.js'
 import handleGetDelegates from './handleGetDelegates.js'
+import handleGetOwnersSafes from './handleGetOwnersSafes.js'
 
 const log = new Logger()
 
@@ -30,7 +31,13 @@ const routeHandlers: Record<string, RouteHandler<any>> = {
   '^GET /v1/multisig-transactions/0x[a-fA-F0-9]+/confirmations/$':
     handleGetTransactionConfirmations,
   '^POST /v1/delegates/$': handleUpdateDelegates,
-  '^GET /v1/delegates/?safe=0x[a-fA-F0-9]+$': handleGetDelegates,
+  '^GET /v1/delegates/\\?safe=0x[a-fA-F0-9]+$': handleGetDelegates,
+  '^GET /v1/owners/0x[a-fA-F0-9]+/safes/$': handleGetOwnersSafes,
+}
+
+export interface DSafeResponse {
+  status: boolean
+  data: any
 }
 
 export default async function handleDSafeRequest(
@@ -39,16 +46,16 @@ export default async function handleDSafeRequest(
   apiRoute: string,
   payload?: unknown,
   network?: string,
-): Promise<boolean> {
-  console.log('Handling:', apiRoute)
+): Promise<any> {
+  console.log('Handling:', httpMethod, apiRoute)
   const apiRouteWithRequestType = `${httpMethod} ${apiRoute}`
   for (const pattern in routeHandlers) {
     if (new RegExp(pattern).test(apiRouteWithRequestType)) {
       console.log(`Implementing route: ${apiRouteWithRequestType}`)
-      await routeHandlers[pattern](composeClient, payload, network)
-      return true
+      const response = await routeHandlers[pattern](composeClient, payload, network)
+      return response
     }
   }
   console.log(`No handler found for route: ${apiRouteWithRequestType}`)
-  return true
+  return { status: false, data: null }
 }

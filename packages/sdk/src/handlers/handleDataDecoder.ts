@@ -11,7 +11,7 @@ const handleDataDecoder: RouteHandler<any> = async (
   network?: string,
 ) => {
   handleDSafeLog('DATA Decoder')
-  log.info('Handle Data Decoder', ['Data Decoer'])
+  log.info('Handle Data Decoder', ['Data Decoder'])
   return true
 }
 
