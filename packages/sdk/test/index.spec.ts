@@ -465,6 +465,26 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
     )
 
     // TODO: Write execution of transaction from safeInstance here:
+    const getTransactionRoute = `/v1/multisig-transactions/${safeTxHash}/`
+    const getTrxPayload: GetTransactionPayload = {
+      safeTxHash,
+    }
+    const transactionData = await dsafe.fetchLegacy('GET', getTransactionRoute, getTrxPayload, chainId)
+    console.log({ transactionData });
+    const tx = await safeInstance.execTransaction(
+      transactionData.data.to,
+      transactionData.data.value,
+      transactionData.data.data,
+      transactionData.data.operation,
+      transactionData.data.safeTxGas,
+      transactionData.data.baseGas,
+      transactionData.data.gasPrice,
+      transactionData.data.gasToken,
+      transactionData.data.refundReceiver,
+      transactionData.data.signature
+    );
+    console.log({tx});
+    await tx.wait();
 
     // TODO: execute the dsafe request here
 
@@ -482,5 +502,5 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
     console.log({ response: response.data })
 
     expect(response.status).toBe(true)
-  }, 10000)
+  }, 40000)
 })
