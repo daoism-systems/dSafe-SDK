@@ -20,11 +20,11 @@ import {
   TEST_ACCOUNT,
   ceramicNodeNetwork,
   delegateAddress,
-  network,
   testUsdt,
   trxInput,
 } from './secrets.js'
 import axios, { type AxiosRequestConfig } from 'axios'
+import { type MarkTransactionExecutedPayload } from '../src/types/MARK_TRANSACTION_EXECUTED.type.js'
 
 dotenv.config({ path: './.env' })
 const log = new Logger()
@@ -300,7 +300,7 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
       url: dsafe.generateApiUrl(getTransactionsRoute, chainId),
     })
 
-    const response = await dsafe.fetchLegacy('GET', getTransactionsRoute, payload, network)
+    const response = await dsafe.fetchLegacy('GET', getTransactionsRoute, payload, chainId)
     console.log({ apiResponse: apiResponse.data, response })
     expect(response.status).toBe(true)
     expect(response.data.count).not.toEqual(0)
@@ -420,7 +420,7 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
       }
       await axios.post(dsafe.generateApiUrl(addDelegateApiRoute, chainId), payload.apiData)
 
-      const response = await dsafe.fetchLegacy('POST', addDelegateApiRoute, payload, network)
+      const response = await dsafe.fetchLegacy('POST', addDelegateApiRoute, payload, chainId)
       expect(response.status).toBeTruthy()
     }
   })
@@ -431,13 +431,76 @@ describe('DSafe: Forward API request to Safe API endpoint', () => {
     }
     const apiResponse = await axios.get(dsafe.generateApiUrl(getDelegateApiRoute, chainId))
 
-    const response = await dsafe.fetchLegacy('GET', getDelegateApiRoute, payload, network)
-    apiResponse.data.results.forEach((result: any) => {
-      delete result.label
-    })
-    console.log({ apiResponse: apiResponse.data.results, response: response.data })
-    response.data.forEach((delegateData: any) => {
+    const response = await dsafe.fetchLegacy('GET', getDelegateApiRoute, payload, chainId)
+    // apiResponse.data.results.forEach((result: any) => {
+    //   delete result.label
+    // })
+    console.log({ apiResponse: apiResponse.data.results, response: response.data.results })
+
+    response.data?.results?.forEach((delegateData: any) => {
       expect(apiResponse.data.results).toContainEqual(delegateData)
     })
   })
+  it('Should mark transaction as executed', async () => {
+    const safeAddress = SAFE_ADDRESS
+
+    const safeAbi = getSafeSingletonDeployment()?.abi
+    if (safeAbi === undefined) {
+      throw Error('Safe ABI is undefined')
+    }
+    const provider = new ethers.providers.InfuraProvider(chainId, process.env.INFURA_PROJECT_ID)
+    const signer = new ethers.Wallet(PRIVATE_KEY as string, provider)
+    const safeInstance = new ethers.Contract(safeAddress, safeAbi, signer)
+    const safeTxHash = await safeInstance.getTransactionHash(
+      trxInput.to,
+      trxInput.value,
+      trxInput.data,
+      trxInput.operation,
+      trxInput.safeTxGas,
+      trxInput.baseGas,
+      trxInput.gasPrice,
+      trxInput.gasToken,
+      trxInput.refundReceiver,
+      trxInput.nonce,
+    )
+
+    // TODO: Write execution of transaction from safeInstance here:
+    const getTransactionRoute = `/v1/multisig-transactions/${safeTxHash}/`
+    const getTrxPayload: GetTransactionPayload = {
+      safeTxHash,
+    }
+    const transactionData = await dsafe.fetchLegacy('GET', getTransactionRoute, getTrxPayload, chainId)
+    console.log({ transactionData });
+    const tx = await safeInstance.execTransaction(
+      transactionData.data.to,
+      transactionData.data.value,
+      transactionData.data.data,
+      transactionData.data.operation,
+      transactionData.data.safeTxGas,
+      transactionData.data.baseGas,
+      transactionData.data.gasPrice,
+      transactionData.data.gasToken,
+      transactionData.data.refundReceiver,
+      transactionData.data.signature
+    );
+    console.log({tx});
+    await tx.wait();
+
+    // TODO: execute the dsafe request here
+
+    const updateExecutorApiRoute = '/markTransactionExecuted'
+
+    const executor = await signer.getAddress()
+    const payload: MarkTransactionExecutedPayload = {
+      executor,
+      safeTxHash,
+      txHash: safeTxHash, // TODO: change this value
+    }
+
+    const response = await dsafe.fetchLegacy('DSAFE', updateExecutorApiRoute, payload, chainId)
+
+    console.log({ response: response.data })
+
+    expect(response.status).toBe(true)
+  }, 40000)
 })

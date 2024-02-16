@@ -14,6 +14,7 @@ import { DID } from 'dids'
 import { getResolver } from 'key-did-resolver'
 import { Ed25519Provider } from 'key-did-provider-ed25519'
 import axios, { type AxiosRequestConfig } from 'axios'
+import { type HttpMethods } from '../types/HTTP_METHODS.type.js'
 const log = new Logger()
 
 export default class DSafe {
@@ -84,7 +85,7 @@ export default class DSafe {
    * @returns axios response after interacting with api route
    */
   async fetchLegacy(
-    httpMethod: 'POST' | 'GET' | 'DELETE',
+    httpMethod: HttpMethods,
     apiRoute: string,
     payload?: any,
     network?: string,
@@ -100,7 +101,7 @@ export default class DSafe {
     )
     console.log({ response })
 
-    if (!response.status) {
+    if (!response.status && httpMethod !== 'DSAFE') {
       const apiUrl = this.generateApiUrl(apiRoute, network)
       log.error('DSafe request failed, execution stopped!', [])
       log.info('Fetch route:', [apiRoute])

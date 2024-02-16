@@ -19,7 +19,7 @@ const handleGetTransaction: RouteHandler<GetTransactionPayload> = async (
   // get transaction based on the hash
   // note: safeTxHash is unique on all chains, i.e. safeTxHash on ETH will be unique and can never exist on other chain
   const transactionExists = await getTransaction(payload.safeTxHash, networkId, composeClient)
-  return { status: transactionExists.exists, data: transactionExists.id }
+  return { status: transactionExists.exists, data: transactionExists.data }
 }
 
 export default handleGetTransaction
