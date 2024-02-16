@@ -191,7 +191,7 @@ export const getTransaction = async (
   safeTxHash: string,
   networkId: string,
   composeClient: ComposeClient,
-): Promise<{ exists: boolean; id?: string }> => {
+): Promise<{ exists: boolean; data?: any }> => {
   console.log(safeTxHash, networkId)
   const executionResult = await composeClient.executeQuery(GET_TRANSACTION(safeTxHash, networkId))
   console.log(executionResult)
@@ -199,13 +199,13 @@ export const getTransaction = async (
     const transactionIndex: any = executionResult.data.transactionIndex
     if (transactionIndex.edges.length !== 0) {
       console.log('Transaction exists')
-      const returnData = { exists: true, id: transactionIndex.edges[0].node }
+      const returnData = { exists: true, data: transactionIndex.edges[0].node }
       return returnData
     } else {
       console.log('Transaction does not exist')
-      return { exists: false, id: undefined }
+      return { exists: false, data: undefined }
     }
   }
   console.log('Error while fetching data from ceramic')
-  return { exists: false, id: undefined }
+  return { exists: false, data: undefined }
 }

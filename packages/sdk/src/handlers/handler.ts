@@ -11,6 +11,8 @@ import handleGetTransactionConfirmations from './handleGetConfirmations.js'
 import handleUpdateDelegates from './handleUpdateDelegates.js'
 import handleGetDelegates from './handleGetDelegates.js'
 import handleGetOwnersSafes from './handleGetOwnersSafes.js'
+import handleMarkTransactionExecuted from './handleMarkTransactionExecuted.js'
+import { type HttpMethods } from '../types/HTTP_METHODS.type.js'
 
 const log = new Logger()
 
@@ -33,6 +35,7 @@ const routeHandlers: Record<string, RouteHandler<any>> = {
   '^POST /v1/delegates/$': handleUpdateDelegates,
   '^GET /v1/delegates/\\?safe=0x[a-fA-F0-9]+$': handleGetDelegates,
   '^GET /v1/owners/0x[a-fA-F0-9]+/safes/$': handleGetOwnersSafes,
+  '^DSAFE /markTransactionExecuted$': handleMarkTransactionExecuted,
 }
 
 export interface DSafeResponse {
@@ -42,7 +45,7 @@ export interface DSafeResponse {
 
 export default async function handleDSafeRequest(
   composeClient: ComposeClient,
-  httpMethod: 'POST' | 'GET' | 'DELETE',
+  httpMethod: HttpMethods,
   apiRoute: string,
   payload?: unknown,
   network?: string,
