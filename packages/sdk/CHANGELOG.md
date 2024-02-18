@@ -1,10 +1,10 @@
 # @dsafe/sdk
 
-## 0.2.0
+## 1.0.0
 
-### Minor Changes
+### Major Changes
 
-- Feat: getter handlers and add delegates
+- Feat: Basic handlers and 100% test coverage. Ready to be published
 
 ## 0.1.0
 
