@@ -2,9 +2,7 @@
 
 ## Introduction
 
-The `@daoism_systems/dsafe-sdk` is a powerful JavaScript SDK designed to facilitate seamless interactions with decentralized storage solutions, leveraging Ceramic network capabilities. This SDK enables developers to easily integrate decentralized data management features into their applications, supporting a wide range of operations from basic data storage and retrieval to complex transaction handling on various blockchain networks.
-
-Incorporating instructions for installing the `@daoism_systems/dsafe-sdk` using yarn and pnpm alongside npm will make the documentation more comprehensive and accessible to a broader range of developers. Here's how you can update the installation section to include these additional package managers:
+The `@daoism_systems/dsafe-sdk` is a powerful JavaScript SDK designed to facilitate seamless interactions with decentralised safe registry (dSafe).
 
 ## Installation
 
@@ -67,6 +65,13 @@ const chainId = 'eip155:1'; // Example CAIP ID for Ethereum Mainnet
 const ceramicNodeNetwork = 'https://your-ceramic-node.com';
 
 const dsafe = new DSafe(chainId, ceramicNodeNetwork);
+
+// [BROWSER] when the intergation is for browser
+await dsafe.initializeDIDOnClient(ethProvider);
+
+// [NODE] when the intergation is for node
+// PRIVATE_KEY is never stored, it's only used to generate DID within the function
+await dsafe.initializeDIDOnNode(PRIVATE_KEY);
 ```
 
 This initializes the `DSafe` object with the specified blockchain network and Ceramic node, making it ready for use in your application.
@@ -75,7 +80,7 @@ This initializes the `DSafe` object with the specified blockchain network and Ce
 
 ## Overview
 
-The `fetchLegacy` function is an essential method in the `@daoism_systems/dsafe-sdk`, designed to streamline interactions with blockchain networks and data. This function abstracts complex HTTP request processes, providing a simplified way to communicate with various API routes not directly implemented in the SDK.
+The `fetchLegacy` function is an essential method in the `@daoism_systems/dsafe-sdk`, designed to streamline interactions with dsafe registry. This function abstracts complex dsafe interaction processes, providing a simplified way to communicate with various API routes.
 
 ## Function Signature
 
@@ -150,7 +155,7 @@ Each section will provide specific examples and best practices for using `fetchL
 - The `ethers` library should be installed for interacting with the Ethereum blockchain.
 - An Infura project ID (`INFURA_PROJECT_ID`) for network access.
 
-### Queries
+### Mutations
 
 #### Create new Transaction
 API Path: `/v1/safes/{address}/multisig-transactions/`
@@ -271,4 +276,521 @@ This guide demonstrates how to create a new transaction within the dSafe environ
 - `trxInput` should be filled with the details of the transaction you intend to execute, such as the recipient address (`to`), value, and data.
 - This guide assumes familiarity with Ethereum transactions and the use of ethers.js for blockchain interactions.
 
-### Mutations
+#### Add new Confirmations to a transaction
+
+This guide outlines the steps to add a new confirmation to an existing transaction within the dSafe environment using the `fetchLegacy` function from the `@daoism_systems/dsafe-sdk`. This is a critical operation for multi-signature transactions that require multiple confirmations to proceed.
+
+### Steps to Add a New Confirmation
+
+1. **Define the Safe Address and Retrieve the ABI:**
+
+   Begin by defining the safe address and retrieving the contract ABI for interaction.
+
+   ```typescript
+   const safeAddress = SAFE_ADDRESS;
+   const safeAbi = getSafeSingletonDeployment()?.abi;
+   if (safeAbi === undefined) {
+     throw Error('Safe ABI is undefined');
+   }
+   ```
+
+2. **Initialize the Ethereum Provider and Signer:**
+
+   Set up the provider and signer using ethers.js to interact with the Ethereum blockchain.
+
+   ```typescript
+   const provider = // provider;
+   const signer = // signer;
+   ```
+
+3. **Instantiate the Safe Contract:**
+
+   Create an instance of the safe contract to interact with.
+
+   ```typescript
+   const safeInstance = new ethers.Contract(safeAddress, safeAbi, signer);
+   ```
+
+4. **Generate the Transaction Hash:**
+
+   Generate the hash of the transaction that you wish to confirm.
+
+   ```typescript
+   const safeTrxHash = await safeInstance.getTransactionHash(
+     trxInput.to,
+     trxInput.value,
+     trxInput.data,
+     trxInput.operation,
+     trxInput.safeTxGas,
+     trxInput.baseGas,
+     trxInput.gasPrice,
+     trxInput.gasToken,
+     trxInput.refundReceiver,
+     trxInput.nonce,
+   );
+   ```
+
+5. **Determine the Update Confirmation Route:**
+
+   Identify the API route for adding a confirmation to the transaction.
+
+   ```typescript
+   const updateConfirmationRoute = `/v1/multisig-transactions/${safeTrxHash}/confirmations/`;
+   ```
+
+6. **Sign the Transaction Hash:**
+
+   Sign the transaction hash to create a confirmation signature.
+
+   ```typescript
+   const signature = (await signer.signMessage(ethers.utils.arrayify(safeTrxHash)))
+     .replace(/1b$/, '1f')
+     .replace(/1c$/, '20');
+   ```
+
+7. **Prepare the Payload:**
+
+   Organize the required data into a payload object for submission.
+
+   ```typescript
+   const payload = {
+     apiData: {
+       signature,
+     },
+     safe: safeAddress,
+     signature,
+     safe_tx_hash: safeTrxHash,
+     sender: signer.address,
+   };
+   ```
+
+8. **Submit the Confirmation:**
+
+   Use `fetchLegacy` to submit the new confirmation to the transaction. Specify the method as `POST`, along with the API route and payload.
+
+   ```typescript
+   const result = await dsafe.fetchLegacy('POST', updateConfirmationRoute, payload, chainId);
+   console.log(result);
+   ```
+
+### Notes
+
+- Replace placeholders like `SAFE_ADDRESS`, `PRIVATE_KEY`, `chainId`, and `process.env.INFURA_PROJECT_ID` with actual values.
+- `trxInput` should be populated with the transaction details you're confirming.
+- This process is essential for multi-signature transactions, where multiple confirmations are required to execute a transaction fully.
+
+#### Add new delegate
+
+This guide details the procedure for adding a new delegate to a safe using the `fetchLegacy` function provided by the `@daoism_systems/dsafe-sdk`. Delegates are external addresses granted permissions to interact with the safe under specific conditions without needing access to the safe's private keys.
+
+### Prerequisites
+
+- The `@daoism_systems/dsafe-sdk` should be installed in your project.
+- Access to an Ethereum wallet with its address (`delegateAddress`) and private key (`PRIVATE_KEY`).
+- The `ethers` library installed for signing messages and Ethereum blockchain interaction.
+- An Infura project ID (`INFURA_PROJECT_ID`) for accessing the Ethereum network.
+
+### Steps to Add a New Delegate
+
+1. **Define the Safe Address and Retrieve the ABI:**
+
+   Begin by defining the safe address and retrieving the contract ABI for interaction.
+
+   ```typescript
+   const safeAddress = SAFE_ADDRESS;
+   ```
+
+2. **Initialize the  Signer:**
+
+   Set up the signer using ethers.js to interact with the Ethereum blockchain.
+
+   ```typescript
+   const signer = // signer;
+
+3. **Define the API Route and Delegate Information:**
+
+   Specify the API route for adding a delegate and the label to identify the delegation relationship.
+
+   ```typescript
+   const addDelegateApiRoute = '/v1/delegates/';
+   const label = 'delegator';
+   ```
+
+4. **Calculate the Time-based OTP (TOTP):**
+
+   Generate a time-based one-time password (TOTP) as part of the signature to ensure temporal validity.
+
+   ```typescript
+   const totp = Math.floor(Date.now() / 1000 / 3600);
+   ```
+
+5. **Sign the Delegate Address and TOTP:**
+
+   Create a signature combining the delegate's address and the TOTP to authenticate the request.
+
+   ```typescript
+   const signatureForDelegate = await signer.signMessage(delegateAddress + totp);
+   ```
+
+6. **Prepare the Payload for Adding a Delegate:**
+
+   Assemble the data required to add a new delegate into a payload object.
+
+   ```typescript
+   const payload = {
+     safe: testSafeOnSepolia,
+     delegate: delegateAddress,
+     delegator: signer.address,
+     signature: signatureForDelegate,
+     label,
+     apiData: {
+       safe: testSafeOnSepolia,
+       delegate: delegateAddress,
+       delegator: signer.address,
+       signature: signatureForDelegate,
+       label,
+     },
+   };
+   ```
+
+7. **Submit the Delegate Addition Request:**
+
+   Use `fetchLegacy` to add the delegate through dSafe's abstraction.
+
+   ```typescript
+   const response = await dsafe.fetchLegacy('POST', addDelegateApiRoute, payload, chainId);
+   expect(response.status).toBeTruthy();
+   ```
+
+### Notes
+
+- Replace placeholders like `testSafeOnSepolia`, `delegateAddress`, `PRIVATE_KEY`, and `chainId` with actual values. Ensure `delegateAddress` is the Ethereum address of the new delegate.
+- The `signer` must be initialized with the `PRIVATE_KEY` and connected to the Ethereum network (e.g., via Infura).
+- The `label` serves as an identifier for the delegation relationship and can be any string value that helps to recognize the delegation purpose or context.
+- This process requires the delegate's address to be signed along with a TOTP to ensure the request's temporal validity, enhancing security.
+
+#### Mark a transaction as executed.
+
+This guide covers the process of marking a transaction as executed within a dSafe-enabled application. This manual step is crucial for maintaining the application's transactional state, as dSafe does not have an indexer to automatically detect the execution status of Safe transactions.
+
+### Steps to Mark a Transaction as Executed
+
+1. **Define the Safe Address and Retrieve the ABI:**
+
+   Begin by defining the Ethereum address of your safe and fetching the contract ABI for interaction.
+
+   ```typescript
+   const safeAddress = SAFE_ADDRESS;
+   const safeAbi = getSafeSingletonDeployment()?.abi;
+   if (safeAbi === undefined) {
+      throw Error('Safe ABI is undefined');
+   }
+   ```
+
+2. **Initialize the Ethereum Provider and Signer:**
+
+   Set up the provider and signer using ethers.js for Ethereum blockchain interactions.
+
+   ```typescript
+   const provider = // provider;
+   const signer = // signer;
+   ```
+
+3. **Instantiate the Safe Contract and Generate the Transaction Hash:**
+
+   Create an instance of the safe contract and generate the hash for the transaction you're marking as executed.
+
+   ```typescript
+   const safeInstance = new ethers.Contract(safeAddress, safeAbi, signer);
+   const safeTxHash = await safeInstance.getTransactionHash(
+     trxInput.to,
+     trxInput.value,
+     trxInput.data,
+     trxInput.operation,
+     trxInput.safeTxGas,
+     trxInput.baseGas,
+     trxInput.gasPrice,
+     trxInput.gasToken,
+     trxInput.refundReceiver,
+     trxInput.nonce,
+   );
+   ```
+
+4. **Execute the Transaction from the Safe Instance:**
+
+   Perform the transaction execution using the safe contract instance. This step involves calling the `execTransaction` method with the transaction details.
+
+   ```typescript
+   const transactionData = await dsafe.fetchLegacy('GET', getTransactionRoute, { safeTxHash }, chainId);
+   const tx = await safeInstance.execTransaction(
+     transactionData.data.to,
+     transactionData.data.value,
+     transactionData.data.data,
+     transactionData.data.operation,
+     transactionData.data.safeTxGas,
+     transactionData.data.baseGas,
+     transactionData.data.gasPrice,
+     transactionData.data.gasToken,
+     transactionData.data.refundReceiver,
+     transactionData.data.signature
+   );
+   await tx.wait();
+   ```
+
+5. **Mark the Transaction as Executed in Your Application:**
+
+   After successfully executing the transaction, use `fetchLegacy` with a custom method `DSAFE` (or another appropriate method as defined in your application) to mark the transaction as executed.
+
+   ```typescript
+   // a custom route has been added to adhere to the nature of fetchLegacy function   
+   const updateExecutorApiRoute = '/markTransactionExecuted';
+   const executor = await signer.getAddress();
+   const payload = {
+     executor,
+     safeTxHash,
+     txHash: tx.hash, // Assuming tx.hash is the transaction hash from the blockchain
+   };
+
+   const response = await dsafe.fetchLegacy('DSAFE', updateExecutorApiRoute, payload, chainId);
+   console.log({ response: response.data });
+   ```
+
+### Notes
+
+- Replace placeholders like `SAFE_ADDRESS`, `PRIVATE_KEY`, `chainId`, `process.env.INFURA_PROJECT_ID`, and `trxInput` with actual values.
+- The `fetchLegacy` call to mark the transaction as executed is a crucial step that must be tailored to the specific implementation details of your dSafe integration. The method `DSAFE` and the route `/markTransactionExecuted` are illustrative and should be adjusted according to your application's API.
+- This process is essential for applications using dSafe to manually track the execution status of transactions due to the lack of an automatic indexing feature in dSafe.
+
+### Queries
+
+#### Get Safe Data
+
+This guide explains how to retrieve data for a specific safe using the `fetchLegacy` function from the `@daoism_systems/dsafe-sdk`. This operation is essential for fetching details about the safe, such as its owners, configuration, and other relevant information.
+
+### Steps to Retrieve Safe Data
+
+1. **Define the Safe Address and API Route:**
+
+   Start by specifying the Ethereum address of the safe and the API endpoint for retrieving safe data.
+
+   ```typescript
+   const safeAddress = SAFE_ADDRESS;
+   const getSafeRoute = `/v1/safes/${safeAddress}/`;
+   ```
+
+2. **Prepare the Payload:**
+
+   Although the payload is not directly used in the `GET` request through `fetchLegacy`, it's prepared for potential use or consistency in documentation.
+
+   ```typescript
+   const payload = {
+     address: safeAddress,
+   };
+   ```
+
+3. **Retrieve Safe Data Using `fetchLegacy`:**
+
+   Utilize the `fetchLegacy` function to abstract the dsafe complexity, simplifying the interaction process. Specify 'GET' as the method and provide the API route along with the chain ID.
+
+   ```typescript
+   const response = await dsafe.fetchLegacy('GET', getSafeRoute, payload, chainId);
+   ```
+
+5. **Process the Retrieved Data:**
+
+   After fetching the data, you can access and utilize the safe's information as needed, such as listing the owners.
+
+   ```typescript
+   console.log({ response: response.data.owners });
+   ```
+
+### Notes
+
+- Replace `SAFE_ADDRESS` and `chainId` with the actual safe address and blockchain network identifier.
+- The `fetchLegacy` function is versatile and supports 'GET' requests without needing a payload, making it suitable for retrieving data.
+- While the direct API call (optional step) demonstrates how to access the data without the SDK abstraction, using `fetchLegacy` streamlines the process and handles any SDK-specific configurations or optimizations.
+
+#### Get all existing transactions on dSafe
+
+This guide demonstrates how to fetch all multisig transactions associated with a specific safe using the `fetchLegacy` function provided by the `@daoism_systems/dsafe-sdk`. This functionality is crucial for monitoring transaction history and status within your application.
+
+### Steps to Retrieve All Transactions
+
+1. **Define the Safe Address and Transactions Route:**
+
+   Specify the Ethereum address of the safe and the API endpoint for fetching multisig transactions.
+
+   ```typescript
+   const safeAddress = SAFE_ADDRESS;
+   const getTransactionsRoute = `/v1/safes/${safeAddress}/multisig-transactions/`;
+   ```
+
+2. **Prepare the Payload:**
+
+   While `GET` requests typically do not use payloads, defining it can help maintain consistency in handling API calls across different operations.
+
+   ```typescript
+   const payload = {
+     address: safeAddress,
+   };
+   ```
+
+3. **Retrieve Transactions Using `fetchLegacy`:**
+
+   Use the `fetchLegacy` function to simplify the dSafe interaction. Provide 'GET' as the method, the transactions route, and the payload along with the chain ID.
+
+   ```typescript
+   const response = await dsafe.fetchLegacy('GET', getTransactionsRoute, payload, chainId);
+   ```
+
+4. **Process and Utilize the Retrieved Transactions:**
+
+   With the transaction data fetched, you can now process or display this information as required by your application.
+
+   ```typescript
+   console.log({ apiResponse: apiResponse.data, response });
+   ```
+
+### Notes
+
+- Replace `SAFE_ADDRESS` and `chainId` with the actual values corresponding to your safe and the blockchain network.
+- The use of `fetchLegacy` for 'GET' requests streamlines interactions with the dSafe API, especially when handling standardized operations like retrieving transactions.
+- Direct API calls are shown for completeness and to offer an alternative method of fetching data. However, the `fetchLegacy` function is recommended for its simplicity and integration with the dSafe SDK.
+
+Retrieving Specific Transactions from dSafe Based on Safe Transaction Hash Using `fetchLegacy`
+------------------------------------------------------------------------------------------------
+
+This guide provides a detailed walkthrough on how to retrieve details for a specific transaction within a safe environment, identified by its transaction hash, using the `fetchLegacy` function from the `@daoism_systems/dsafe-sdk`. This functionality is particularly useful for tracking the status or details of individual transactions.
+
+### Prerequisites
+
+- The `@daoism_systems/dsafe-sdk` must be installed in your project.
+- Ethereum wallet address (`SAFE_ADDRESS`) and its private key (`PRIVATE_KEY`).
+- The `ethers` library for Ethereum blockchain interactions.
+- An Infura project ID (`INFURA_PROJECT_ID`) for accessing the Ethereum network.
+
+### Steps to Retrieve a Specific Transaction
+
+1. **Define the Safe Transaction Hash:**
+
+   Define the safeTrxHash for the transaction you're interested in.
+
+   ```typescript
+   const safeTxHash = // 0xSafeTrxHash;
+   ```
+
+2. **Prepare the Payload:**
+
+   While `GET` requests typically do not require payloads, preparing it can ensure consistency across different types of requests.
+
+   ```typescript
+   const payload = {
+     safeTxHash,
+   };
+   ```
+
+3. **Retrieve the Transaction Data Using `fetchLegacy`:**
+
+   Use `fetchLegacy` to abstract the dSafe interaction. Provide 'GET' as the method, the specific transaction route, and the payload along with the chain ID.
+
+   ```typescript
+   const response = await dsafe.fetchLegacy('GET', getTransactionRoute, payload, chainId);
+   ```
+
+4. **Process and Utilize the Transaction Data:**
+
+   With the transaction details fetched, you can now access and use this information as required.
+
+   ```typescript
+   console.log({ response });
+   ```
+
+### Notes
+
+- Replace placeholders like `SAFE_ADDRESS`, `PRIVATE_KEY`, `chainId`, and `process.env.INFURA_PROJECT_ID` with actual values. Ensure `trxInput` contains the transaction details you're querying.
+- The use of `fetchLegacy` for 'GET' requests simplifies interactions with the dSafe API, especially for retrieving specific transaction details.
+- Direct API calls are shown for completeness and offer an alternative way to access data. However, utilizing `fetchLegacy` is recommended for its ease of use and integration with the dSafe SDK.
+
+#### Get Confirmations of Safe Transaction Hash
+
+This guide describes how to obtain confirmations for a specific transaction within a safe environment using the `fetchLegacy` function from the `@daoism_systems/dsafe-sdk`. Confirmations are crucial for understanding the approval status of multisig transactions.
+
+### Steps to Retrieve Transaction Confirmations
+
+1. **Define the Safe Transaction Hash:**
+
+   Define the safeTrxHash for the transaction you're interested in.
+
+   ```typescript
+   const safeTxHash = // 0xSafeTrxHash;
+   ```
+
+2. **Define the API Route for Retrieving Confirmations:**
+
+   Specify the API route for fetching the transaction's confirmations using its hash.
+
+   ```typescript
+   const getConfirmationRoute = `/v1/multisig-transactions/${safeTxHash}/confirmations/`;
+   ```
+
+3. **Retrieve Confirmations Using `fetchLegacy`:**
+
+   Use `fetchLegacy` to abstract the dSafe interaction, specifying 'GET' as the method along with the confirmations route and payload.
+
+   ```typescript
+   const payload = {
+     safeTxHash,
+   };
+   
+   const response = await dsafe.fetchLegacy('GET', getConfirmationRoute, payload, chainId);
+   ```
+
+4. **Process and Utilize the Confirmation Data:**
+
+   With the confirmation details fetched, you can now analyze and display this information as required by your application.
+
+   ```typescript
+   console.log({response: response.data});
+   ```
+
+### Notes
+
+- Replace placeholders like `SAFE_ADDRESS`, `PRIVATE_KEY`, `chainId`, and `process.env.INFURA_PROJECT_ID` with actual values. Ensure `trxInput` contains the transaction details for which confirmations are being queried.
+- The use of `fetchLegacy` for 'GET' requests simplifies interactions with the dSafe API, especially when retrieving specific details like transaction confirmations.
+- Direct API calls are shown for completeness and offer an alternative way to access data. However, utilizing `fetchLegacy` is recommended for its ease of use and integration with the dSafe SDK.
+
+#### Get delegate for a safe
+
+This guide outlines the steps to retrieve delegate information for a specific safe using the `fetchLegacy` function from the `@daoism_systems/dsafe-sdk`. Delegates are addresses that have been given permission to interact with the safe in various capacities, and retrieving their information is crucial for managing these permissions.
+
+### Steps to Retrieve Delegate Information
+
+1. **Define the API Route for Retrieving Delegates:**
+
+   Specify the API route to fetch delegate information for the safe. Include the safe's address as a query parameter in the route.
+
+   ```typescript
+   const getDelegateApiRoute = `/v1/delegates/?safe=${testSafeOnSepolia}`;
+   ```
+
+2. **Retrieve Delegate Information Using `fetchLegacy`:**
+
+   Utilize the `fetchLegacy` function to simplify the dSafe interaction. Provide 'GET' as the method and include the delegate API route along with the payload and chain ID.
+
+   ```typescript
+   const response = await dsafe.fetchLegacy('GET', getDelegateApiRoute, payload, chainId);
+   ```
+
+3. **Process and Utilize the Retrieved Delegate Information:**
+
+   With the delegate information fetched, you can now process or display this information as needed. For example, you may list the delegates and their permissions associated with the safe.
+
+   ```typescript
+   console.log({ response: response.data.results });
+   ```
+
+### Notes
+
+- Replace `testSafeOnSepolia` and `chainId` with the actual safe address and blockchain network identifier.
+- The use of `fetchLegacy` for 'GET' requests streamlines interactions with the dSafe API, making it easier to retrieve specific details like delegate information.
+- Direct API calls are shown for completeness and to offer an alternative method of fetching data. However, the `fetchLegacy` function is recommended for its integration with the dSafe SDK and simplified handling.
