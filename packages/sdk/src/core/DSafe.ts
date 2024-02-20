@@ -32,7 +32,7 @@ export default class DSafe {
     ceramicNetworkOverride?: string,
     customDefinition?: RuntimeCompositeDefinition
   ) {
-    const definitionToUse = customDefinition === undefined ? definition : customDefinition
+    const definitionToUse = customDefinition ?? definition
     const ceramicNodeUrlToUse = ceramicNetworkOverride ?? CERAMIC_NETWORKS[ceramicNetwork]
     this.initialised = true
     this.network = network
