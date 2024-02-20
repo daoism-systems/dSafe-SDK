@@ -122,6 +122,14 @@ const response: AxiosResponse = await dsafe.fetchLegacy('GET', apiRoute)
 // ... do something with response
 ```
 
+## Future Improvements:
+1. Handle `get safe data` and `get all owners of safe` to sync with Safe API and save all the existing owners to the dSafe as well.
+2. Use better coverage tool to ensure the test coverage isn't counting certain imports as well as exports as untested.
+
+## Knwon Edge Cases:
+1. If a safe have more than one owner and few owners haven't interacted with dSafe at all, then dSafe will not be able to ever know about those owners.
+2. If a nonce have already been used, then tests will fail as Safe doesn't allow to use nonce which have already been used or nonce that is not latest nonce.
+
 ## Docs:
 
 1. [Technical Specification Document](https://docs.google.com/document/d/1zqZB8sIdhLuZWoqa2mWrcNSx7H7trtcxRHwgT_UiVA4/edit?usp=sharing)
