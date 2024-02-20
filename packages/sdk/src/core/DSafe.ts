@@ -30,14 +30,16 @@ export default class DSafe {
     network: string,
     ceramicNetwork: keyof CeramicNetwork,
     ceramicNetworkOverride?: string,
+    customDefinition?: RuntimeCompositeDefinition
   ) {
+    const definitionToUse = customDefinition === undefined ? definition : customDefinition
     const ceramicNodeUrlToUse = ceramicNetworkOverride ?? CERAMIC_NETWORKS[ceramicNetwork]
     this.initialised = true
     this.network = network
     this.ceramicClient = new CeramicClient(ceramicNodeUrlToUse)
     this.composeClient = new ComposeClient({
       ceramic: ceramicNodeUrlToUse,
-      definition: definition as RuntimeCompositeDefinition,
+      definition: definitionToUse as RuntimeCompositeDefinition,
     })
     log.info('DSafe SDK initialised. Chain ID and Ceramic Node URL', [network, ceramicNodeUrlToUse])
   }
