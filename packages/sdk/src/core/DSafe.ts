@@ -64,6 +64,7 @@ export default class DSafe {
     const authMethod = await EthereumWebAuth.getAuthMethod(ethProvider, accountId)
 
     const session = await DIDSession.get(accountId, authMethod, { resources: this.composeClient.resources})
+    this.did = session.did
     this.composeClient.setDID(session.did)
   }
 
