@@ -107,5 +107,6 @@ This initializes the DSafe object with the specified blockchain network and Cera
 For more info please refer to:
 
 [Technical Specification Document](https://mirror.xyz/0013700.eth/89eXlnvtFN7r4J1OzmP0sYx7koJOeXacpR9OqkGV5Wk)
-[Technical Guide]([https://mirror.xyz/0013700.eth/89eXlnvtFN7r4J1OzmP0sYx7koJOeXacpR9OqkGV5Wk](https://github.com/daoism-systems/dSafe-SDK/blob/main/packages/sdk/docs/technical-guide.md)https://github.com/daoism-systems/dSafe-SDK/blob/main/packages/sdk/docs/technical-guide.md)
+
+[Technical Guide](https://github.com/daoism-systems/dSafe-SDK/blob/main/packages/sdk/docs/technical-guide.md))
 
