@@ -15,6 +15,8 @@ import { getResolver } from 'key-did-resolver'
 import { Ed25519Provider } from 'key-did-provider-ed25519'
 import axios, { type AxiosRequestConfig } from 'axios'
 import { type HttpMethods } from '../types/HTTP_METHODS.type.js'
+import { DIDSession } from 'did-session'
+import { EthereumWebAuth, getAccountId } from '@didtools/pkh-ethereum'
 const log = new Logger()
 
 export default class DSafe {
@@ -56,11 +58,19 @@ export default class DSafe {
     this.composeClient.setDID(did)
   }
 
-  async initializeDIDOnClient(): Promise<void> {}
+  async initializeDIDOnClient(ethProvider: any): Promise<void> {
+    const addresses = await ethProvider.request({ method: 'eth_requestAccounts' })
+    const accountId = await getAccountId(ethProvider, addresses[0])
+    const authMethod = await EthereumWebAuth.getAuthMethod(ethProvider, accountId)
+
+    const session = await DIDSession.get(accountId, authMethod, { resources: this.composeClient.resources})
+    this.composeClient.setDID(session.did)
+  }
 
   /**
    * @function generateApiUrl Generate API url
    * @param apiRoute endpoint route eg. '/about' etc.
+   * @param network the network of target safe
    * @returns generated API URL to interact with Server
    */
   generateApiUrl(apiRoute: string, network?: string): string {
@@ -82,6 +92,7 @@ export default class DSafe {
    * @param httpMethod GET | POST | DELETE
    * @param apiRoute endpoint route eg. '/about' etc.
    * @param payload payload/data/body to be sent to api route
+   * @param network the network of target safe
    * @returns axios response after interacting with api route
    */
   async fetchLegacy(
