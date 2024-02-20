@@ -2,7 +2,7 @@
 
 ## Introduction
 
-The `@daoism_systems/dsafe-sdk` is a powerful JavaScript SDK designed to facilitate seamless interactions with decentralised safe registry (dSafe).
+The `@daoism_systems/dsafe-sdk` is a JavaScript SDK designed to facilitate seamless interactions with decentralised safe registry (dSafe).
 
 ## Installation
 

@@ -124,6 +124,6 @@ const response: AxiosResponse = await dsafe.fetchLegacy('GET', apiRoute)
 
 ## Docs:
 
-1. [Technical Specification Document](https://docs.google.com/document/d/1zqZB8sIdhLuZWoqa2mWrcNSx7H7trtcxRHwgT_UiVA4/edit?usp=sharing)
+1. [Technical Specification Document](https://mirror.xyz/0013700.eth/89eXlnvtFN7r4J1OzmP0sYx7koJOeXacpR9OqkGV5Wk)
 2. [Grant Proposal](https://app.charmverse.io/safe-grants-program/page-5195256681472322)
 3. [Technical Documentation](./docs//technical-guide.md)
