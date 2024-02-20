@@ -1,5 +1,17 @@
 # @dsafe/sdk
 
+## 1.1.3
+
+### Patch Changes
+
+- patch: allow custom definitions to support local deployment
+
+## 1.1.2
+
+### Patch Changes
+
+- patch: fix set DID on initialize and update definitions
+
 ## 1.1.1
 
 ### Patch Changes
