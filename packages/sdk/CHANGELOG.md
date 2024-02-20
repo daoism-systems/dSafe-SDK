@@ -1,5 +1,11 @@
 # @dsafe/sdk
 
+## 1.1.0
+
+### Minor Changes
+
+- Feat: update the package with final test coverage"
+
 ## 1.0.0
 
 ### Major Changes
