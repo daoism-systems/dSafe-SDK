@@ -103,6 +103,7 @@ const dsafe = new DSafe(chainId, ceramicNodeNetwork);
 
 This initializes the DSafe object with the specified blockchain network and Ceramic node, making it ready for use in your application.
 
+### Docs:
 
 For more information please refer to:
 
