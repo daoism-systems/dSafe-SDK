@@ -1,5 +1,35 @@
 # @dsafe/sdk
 
+## 1.1.8
+
+### Patch Changes
+
+- fix: cleaned up, removed console and fixed initializeDIDOnClient
+
+## 1.1.7
+
+### Patch Changes
+
+- patch: use window.ethereum to get provider
+
+## 1.1.6
+
+### Patch Changes
+
+- patch: added logs to debug initialize
+
+## 1.1.5
+
+### Patch Changes
+
+- patch: pass signer address directly to initialize
+
+## 1.1.4
+
+### Patch Changes
+
+- patch: support viem's client to get address when initializing
+
 ## 1.1.3
 
 ### Patch Changes

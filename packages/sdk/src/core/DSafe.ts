@@ -60,8 +60,16 @@ export default class DSafe {
     this.composeClient.setDID(did)
   }
 
-  async initializeDIDOnClient(ethProvider: any): Promise<void> {
-    const addresses = await ethProvider.request({ method: 'eth_requestAccounts' })
+  async initializeDIDOnClient(window: any): Promise<void> {
+    if (window?.ethereum === null || window?.ethereum === undefined) {
+      throw new Error("No injected Ethereum provider found.");
+    }
+    const ethProvider = window.ethereum;
+
+    // request ethereum accounts.
+    const addresses = await ethProvider.enable({
+      method: "eth_requestAccounts",
+    });
     const accountId = await getAccountId(ethProvider, addresses[0])
     const authMethod = await EthereumWebAuth.getAuthMethod(ethProvider, accountId)
 
