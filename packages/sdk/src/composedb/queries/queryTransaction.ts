@@ -41,6 +41,9 @@ transactionIndex(
   edges {
     node {
       safeID
+      safe {
+        safeAddress
+      }
       baseGas
       data
       executor
@@ -84,6 +87,9 @@ transactionIndex(
   edges {
     node {
       safeID
+      safe {
+        safeAddress
+      }
       baseGas
       data
       executor

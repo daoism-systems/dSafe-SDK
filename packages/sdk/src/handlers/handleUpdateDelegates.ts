@@ -6,6 +6,7 @@ import { type UpdateDelegatePayload } from '../types/CREATE_DELEGATE.type.js'
 import { composeDelegate } from '../composedb/mutations/mutateDelegate.js'
 import { checkDelegateExists, getDelegate } from '../composedb/queries/queryDelegates.js'
 import { checkSafeExists, getSafe } from '../composedb/queries/querySafe.js'
+import { CAIP } from '../config/networks.js'
 // POST /v1/delegates/
 
 const handleUpdateDelegates: RouteHandler<UpdateDelegatePayload> = async (
@@ -15,7 +16,9 @@ const handleUpdateDelegates: RouteHandler<UpdateDelegatePayload> = async (
 ) => {
   const apiData = payload?.apiData
 
-console.log('Payload.delegate', apiData?.delegate)
+  const NETWORK = CAIP[`${network}`]
+
+  console.log('Payload.delegate', apiData?.delegate)
   // todo: use transaction stream ID to fetch safe instead of taking it from user
   let response: any
   try {
@@ -74,7 +77,7 @@ console.log('Payload.delegate', apiData?.delegate)
     content: {
       delegate: apiData?.delegate,
       delegatorID: signerStreamId,
-      network,
+      NETWORK,
       safeID: safeStreamId,
     },
   }
