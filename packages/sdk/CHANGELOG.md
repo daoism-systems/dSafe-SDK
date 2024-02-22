@@ -1,5 +1,11 @@
 # @dsafe/sdk
 
+## 1.1.9
+
+### Patch Changes
+
+- patch: response includes safe address from ceramic
+
 ## 1.1.8
 
 ### Patch Changes
