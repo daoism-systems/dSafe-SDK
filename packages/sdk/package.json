@@ -1,6 +1,6 @@
 {
   "name": "@daoism-systems/dsafe-sdk",
-  "version": "1.1.8",
+  "version": "1.1.9",
   "description": "A decentralised registry for Safe (Safe-Global) to replacce Safe's Safe Transaction API",
   "exports": "./dist/index.js",
   "type": "module",
