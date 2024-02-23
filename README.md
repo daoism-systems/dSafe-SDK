@@ -4,7 +4,7 @@
 
 # dSafe SDK
 
-The dSafe SDK is a software development kit designed to enable dApp developers to interact with Safe(core) smart contracts, bypassing the SafeTransaction API and collecting off-chain transaction signatures in ComposeDB, a decentralized database. It allows for the decentralization of Safe(core) transaction data collection and storage.
+The dSafe SDK is a software development kit designed to enable dApp developers to interact with Safe(core) smart contracts, bypassing the Safe Transaction API and collecting off-chain transaction signatures in ComposeDB, a decentralized database. It allows for the decentralization of Safe(core) transaction data collection and storage.
 
 Instead of relying on the existing SafeTransaction API, Django server, and PostgreSQL database, dSafe offers direct frontend integration with ComposeDB, a distributed database built on the Ceramic network.
 
