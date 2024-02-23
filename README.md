@@ -1,4 +1,6 @@
-<img src="https://images.mirror-media.xyz/publication-images/qPZwL22UQjOxK5kO2R3TX.png?height=832&width=1664" width="600" height="400" alt="Header Image">
+<div style="text-align: center;">
+    <img src="https://images.mirror-media.xyz/publication-images/qPZwL22UQjOxK5kO2R3TX.png?height=832&width=1664" width="800" height="400" alt="Header Image">
+</div>
 
 # dSafe SDK
 
