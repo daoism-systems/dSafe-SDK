@@ -1,10 +1,10 @@
 ## Understanding the Internal Workings of `fetchLegacy`
 
-The `fetchLegacy` function is a crucial component of the dSafe SDK, designed to abstract the complexity of interacting with Safe's composeDB schema. It serves as a bridge between the client-side application and the composeDB services, handling requests across different network configurations and API routes. This section delves into the internal mechanics of `fetchLegacy`, focusing on how it dynamically selects the appropriate handler based on the passed route.
+The `fetchLegacy` function is a crucial component of the dSafe SDK. It abstracts the complexity of interacting with Safe's composeDB schema. This section delves into the internal mechanics of `fetchLegacy`, focusing on how it dynamically selects the appropriate handler based on the passed route.
 
 ### Overview of `fetchLegacy`
 
-`fetchLegacy` is an asynchronous function that takes four parameters: `httpMethod`, `apiRoute`, an optional `payload`, and an optional `network` string. Its primary role is to facilitate communication with the composeDB by determining the correct handler for the given API route and method, executing the request, and processing the response.
+`fetchLegacy` is an async function that takes four parameters: `httpMethod`, `apiRoute`, an optional `payload`, and an optional `network` string.
 
 ```typescript
 async fetchLegacy(
@@ -17,21 +17,21 @@ async fetchLegacy(
 
 ### Process Flow
 
-1. **Handling the Request:** The core of `fetchLegacy` lies in its ability to delegate the request handling to specific functions based on the API route and method. This delegation is managed by the `handleDSafeRequest` function, which utilizes a mapping of regex patterns to handler functions.
+1. **Request Handling:** `fetchLegacy` delegates request handling based on API route and method through `handleDSafeRequest`, which maps regex patterns to specific handler functions.
 
-2. **Dynamic Route Handling:** Inside `handleDSafeRequest`, the function constructs a string that combines the `httpMethod` and `apiRoute`. It then iterates over a predefined set of route handlers, checking if the combined string matches any regex patterns specified in the `routeHandlers` object.
+2. **Route Matching:** `handleDSafeRequest` combines `httpMethod` and `apiRoute` to match against predefined patterns in `routeHandlers`, selecting the appropriate handler for execution.
 
-3. **Executing the Handler:** Upon finding a match, `handleDSafeRequest` invokes the corresponding handler function with the `composeClient`, `payload`, and `network` as arguments. This handler function is responsible for processing the request and returning the response.
+3. **Handler Execution:** The matched handler is executed with `composeClient`, `payload`, and `network` arguments to process the request and generate a response.
 
-4. **Executing Mutations and Queries on ComposeDB:** When a handler matches the input route, it performs the necessary mutations and queries on ComposeDB relevant to the endpoint's specific business logic. This step involves direct interactions with ComposeDB or other services to fulfill the request's objectives. For developers interested in the specific operations executed by each handler, detailed documentation is available [here](./handlers.md), providing insights into the ComposeDB mutations, queries, and overall logic applied by each handler.
+4. **Interaction with ComposeDB:** Matched handlers perform required mutations and queries on ComposeDB as per the endpoint's business logic. Detailed handler operations are documented [here](./handlers.md), showcasing specific ComposeDB interactions.
 
-5. **Fallback to Axios Request:** If no matching handler is found (indicating that the request cannot be processed internally), and the `httpMethod` is not 'DSAFE', `fetchLegacy` constructs an Axios request. It attempts to directly interact with the specified API route, using the provided `payload` and `network` information. This step ensures that even unhandled routes can be processed, albeit without the specialized processing logic of dSafe handlers.
+5. **Axios Fallback:** If no handler is found for a request, and it's not a 'DSAFE' method, `fetchLegacy` initiates an Axios request to the API using the given `payload` and `network`, ensuring all requests are processed.
 
-6. **Error Handling and Response:** `fetchLegacy` captures any errors that occur during the Axios request and logs detailed error information. Regardless of the request's success or failure, it returns a structured response containing the status and data.
+6. **Response Management:** Errors from Axios requests are logged with detailed information, and `fetchLegacy` returns a response with the outcome status and data.
 
-### The `routeHandlers` Object
+### `routeHandlers` Object Overview
 
-The `routeHandlers` object is a key component in the dynamic selection of request handlers. It maps regex patterns, which represent combinations of HTTP methods and API routes, to specific handler functions. These handlers are tailored to process requests for their respective routes efficiently, utilizing the `composeClient` for interactions that require ComposeDB or other decentralized technologies.
+The `routeHandlers` object maps regex patterns to specific request handler functions based on combinations of HTTP methods and API routes. This mechanism enables efficient processing tailored to each route, leveraging `composeClient` for operations requiring ComposeDB or similar technologies.
 
 ```typescript
 const routeHandlers: Record<string, RouteHandler<any>> = {
@@ -41,8 +41,7 @@ const routeHandlers: Record<string, RouteHandler<any>> = {
   '^GET /v1/safes/0x[a-fA-F0-9]+/$': handleGetSafe,
   '^GET /v1/safes/0x[a-fA-F0-9]+/multisig-transactions/$': handleGetAllTransactions,
   '^GET /v1/multisig-transactions/0x[a-fA-F0-9]+/$': handleGetTransaction,
-  '^GET /v1/multisig-transactions/0x[a-fA-F0-9]+/confirmations/$':
-    handleGetTransactionConfirmations,
+  '^GET /v1/multisig-transactions/0x[a-fA-F0-9]+/confirmations/$': handleGetTransactionConfirmations,
   '^POST /v1/delegates/$': handleUpdateDelegates,
   '^GET /v1/delegates/\\?safe=0x[a-fA-F0-9]+$': handleGetDelegates,
   '^GET /v1/owners/0x[a-fA-F0-9]+/safes/$': handleGetOwnersSafes,
@@ -50,6 +49,6 @@ const routeHandlers: Record<string, RouteHandler<any>> = {
 };
 ```
 
-Each pattern is a string that, when converted to a RegExp object, is used to test against the combined `httpMethod` and `apiRoute`. This design allows `fetchLegacy` to support a wide range of API routes with specific processing logic for each, enhancing the SDK's flexibility and capability to interact with diverse backend services.
+Patterns are strings that become RegExp objects for matching against `httpMethod` and `apiRoute` combinations. This structure supports diverse API interactions, offering extensive flexibility for the SDK. 
 
-Find usage guidelines [here](./technical-guide.md#using-fetchlegacy).
+For detailed usage, see [Technical Guide: Using `fetchLegacy`](./technical-guide.md#using-fetchlegacy).
