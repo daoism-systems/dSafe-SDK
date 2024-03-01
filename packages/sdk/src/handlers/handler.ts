@@ -38,8 +38,11 @@ const routeHandlers: Record<string, RouteHandler<any>> = {
   '^DSAFE /markTransactionExecuted$': handleMarkTransactionExecuted,
 }
 
+export type DSafeResponseTypes = 'SDK' | 'API'
+
 export interface DSafeResponse {
   status: boolean
+  responseType: 'SDK' | 'API'
   data: any
 }
 
