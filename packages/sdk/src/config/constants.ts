@@ -12,7 +12,7 @@ export const API_NETWORKS: SAFE_API_NETWORK = {
 
 export const CERAMIC_NETWORKS: CeramicNetwork = {
   local: 'http://0.0.0.0:7007',
-  testnet: '',
+  testnet: 'https://ceramic-safe-global-testnet.hirenodes.io',
   mainnet: '',
 }
 

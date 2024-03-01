@@ -5,7 +5,10 @@ import Logger from '../utils/Logger.utils.js'
 // import axios, { type AxiosRequestConfig } from 'axios'
 import { throwError } from '../utils/error.utils.js'
 import { ERROR_CODE } from '../config/ERROR_CODES.js'
-import handleDSafeRequest, { type DSafeResponse } from '../handlers/handler.js'
+import handleDSafeRequest, {
+  type DSafeResponseTypes,
+  type DSafeResponse,
+} from '../handlers/handler.js'
 import { type CeramicNetwork } from '../types/SAFE_API_NETWORK.types.js'
 import { definition } from '../../__generated__/definitions.dev.js'
 import { type RuntimeCompositeDefinition } from '@composedb/types'
@@ -30,7 +33,7 @@ export default class DSafe {
     network: string,
     ceramicNetwork: keyof CeramicNetwork,
     ceramicNetworkOverride?: string,
-    customDefinition?: RuntimeCompositeDefinition
+    customDefinition?: RuntimeCompositeDefinition,
   ) {
     const definitionToUse = customDefinition ?? definition
     const ceramicNodeUrlToUse = ceramicNetworkOverride ?? CERAMIC_NETWORKS[ceramicNetwork]
@@ -62,18 +65,20 @@ export default class DSafe {
 
   async initializeDIDOnClient(window: any): Promise<void> {
     if (window?.ethereum === null || window?.ethereum === undefined) {
-      throw new Error("No injected Ethereum provider found.");
+      throw new Error('No injected Ethereum provider found.')
     }
-    const ethProvider = window.ethereum;
+    const ethProvider = window.ethereum
 
     // request ethereum accounts.
     const addresses = await ethProvider.enable({
-      method: "eth_requestAccounts",
-    });
+      method: 'eth_requestAccounts',
+    })
     const accountId = await getAccountId(ethProvider, addresses[0])
     const authMethod = await EthereumWebAuth.getAuthMethod(ethProvider, accountId)
 
-    const session = await DIDSession.get(accountId, authMethod, { resources: this.composeClient.resources})
+    const session = await DIDSession.get(accountId, authMethod, {
+      resources: this.composeClient.resources,
+    })
     this.did = session.did
     this.composeClient.setDID(session.did)
   }
@@ -112,6 +117,7 @@ export default class DSafe {
     payload?: any,
     network?: string,
   ): Promise<DSafeResponse> {
+    let responseType: DSafeResponseTypes = 'SDK'
     console.log('Fetching...', apiRoute)
     // const apiUrl = this.generateApiUrl(apiRoute, network)
     const response = await handleDSafeRequest(
@@ -136,7 +142,8 @@ export default class DSafe {
       try {
         const result = await axios.request(options)
         console.log({ result })
-        return { status: true, data: result.data }
+        responseType = 'API'
+        return { status: true, data: result.data, responseType }
       } catch (e: any) {
         console.error({
           error: {
@@ -148,6 +155,7 @@ export default class DSafe {
         return e
       }
     }
+    response.responseType = responseType
     return response
   }
 }
