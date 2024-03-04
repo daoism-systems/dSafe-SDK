@@ -7,4 +7,6 @@ package.json
 tsconfig.json
 **/*.dev.json
 **/*.dev.js
+**/*.prod.json
+**/*.prod.js
 node_modules/
