@@ -1,5 +1,11 @@
 # @dsafe/sdk
 
+## 1.3.0
+
+### Minor Changes
+
+- Feat: add definitions for productions
+
 ## 1.1.9
 
 ### Patch Changes
