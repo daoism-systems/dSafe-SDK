@@ -1,5 +1,7 @@
 # DSafe-SDK
 
+Find technical documentation on using the sdk [here](./docs/technical-guide.md).
+
 ## Install
 
 ## Pre-requisites
